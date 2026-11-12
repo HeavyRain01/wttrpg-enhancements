@@ -86,22 +86,30 @@ export function getWeaponSkillNativeAttackSkill(system) {
         : system?.meleeAttackSkill;
 }
 
-export function getWeaponSkillEffectiveAttackSkill(system) {
-    if (!system) return '';
-    if (
-        system.attackSkillOverrideMode === ATTACK_SKILL_OVERRIDE_MODES.STANDARD
-        && system.attackSkillOverrideKey
-    ) {
-        return system.attackSkillOverrideKey;
+export function getWeaponSkillAttackSource(system) {
+    // Earlier sheets stored the profession selection independently of the standard override mode.
+    if (system?.professionAttackSkill || system?.attackSkillOverrideMode === ATTACK_SKILL_OVERRIDE_MODES.PROFESSION) {
+        return ATTACK_SKILL_OVERRIDE_MODES.PROFESSION;
     }
+    return system?.attackSkillOverrideMode === ATTACK_SKILL_OVERRIDE_MODES.STANDARD
+        ? ATTACK_SKILL_OVERRIDE_MODES.STANDARD
+        : ATTACK_SKILL_OVERRIDE_MODES.NONE;
+}
 
-    return getWeaponSkillNativeAttackSkill(system) ?? '';
+export function getWeaponSkillEffectiveAttackSkill(system) {
+    switch (getWeaponSkillAttackSource(system)) {
+        case ATTACK_SKILL_OVERRIDE_MODES.PROFESSION:
+            return system.professionAttackSkill ?? '';
+        case ATTACK_SKILL_OVERRIDE_MODES.STANDARD:
+            return system.attackSkillOverrideKey ?? '';
+        default:
+            return getWeaponSkillNativeAttackSkill(system) ?? '';
+    }
 }
 
 export async function withWeaponSkillNativeAttackOverride(skill, callback) {
     if (
-        !skill?.system
-        || skill.system.attackSkillOverrideMode !== ATTACK_SKILL_OVERRIDE_MODES.STANDARD
+        getWeaponSkillAttackSource(skill?.system) !== ATTACK_SKILL_OVERRIDE_MODES.STANDARD
         || !skill.system.attackSkillOverrideKey
     ) {
         return callback(skill);

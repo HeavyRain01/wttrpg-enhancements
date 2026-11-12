@@ -62,7 +62,8 @@ export default function getWeaponSkillDataModel() {
                     initial: ATTACK_SKILL_OVERRIDE_MODES.NONE,
                     label: 'WTTRPGEnhancements.WeaponSkill.AttackSkillOverrideLabel'
                 }),
-                attackSkillOverrideKey: new fields.StringField({ initial: '' })
+                attackSkillOverrideKey: new fields.StringField({ initial: '' }),
+                professionAttackSkill: new fields.StringField({ initial: '' })
             };
         }
 

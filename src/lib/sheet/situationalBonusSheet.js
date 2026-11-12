@@ -1,4 +1,5 @@
 import { bindConditionAutocomplete } from '../util/conditionAutocomplete.js';
+import { getProfessionSkills } from '../util/professionSkill.js';
 import { SITUATIONAL_BONUS_SCOPES, TEMPLATE_PATHS } from '../util/constants.js';
 
 const { ItemSheetV2 } = foundry.applications.sheets;
@@ -59,21 +60,12 @@ export default class SituationalBonusSheet extends HandlebarsApplicationMixin(It
                 checked: selectedSkills.has(skill.uuid) || selectedSkills.has(skill.id),
                 group: game.i18n.localize('WTTRPGEnhancements.SituationalBonus.CustomSkills')
             }));
-        const profession = Array.from(this.document.actor?.items ?? []).find(item => item.type === 'profession');
-        const professionSystem = profession?.system;
-        const professionSkills = professionSystem ? [
-            professionSystem.definingSkill,
-            ...['skillPath1', 'skillPath2', 'skillPath3'].flatMap(path => [
-                professionSystem[path]?.skill1,
-                professionSystem[path]?.skill2,
-                professionSystem[path]?.skill3
-            ])
-        ].filter(skill => skill?.skillName).map(skill => ({
+        const professionSkills = getProfessionSkills(this.document.actor).filter(skill => skill?.skillName).map(skill => ({
             value: `profession:${skill.skillName}`,
             label: skill.skillName,
             checked: selectedSkills.has(`profession:${skill.skillName}`),
             group: game.i18n.localize('WTTRPGEnhancements.SituationalBonus.ProfessionSkills')
-        })) : [];
+        }));
         const regularSkills = [...standardSkills, ...customSkills]
             .sort((left, right) => left.label.localeCompare(right.label));
         professionSkills.sort((left, right) => left.label.localeCompare(right.label));

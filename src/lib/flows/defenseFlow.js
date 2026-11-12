@@ -1,4 +1,5 @@
 import { isWeaponSkill } from '../util/weaponSkillAttachment.js';
+import { getSkillLabel } from '../util/skillLabel.js';
 
 const { DialogV2 } = foundry.applications.api;
 
@@ -16,10 +17,10 @@ function buildAdditionalDefenseButtons(skill) {
         .filter(Boolean)
         .map(skillMapEntry => ({
             action: `weapon-skill-defense-${skillMapEntry.name}`,
-            label: game.i18n.localize(skillMapEntry.label),
+            label: getSkillLabel(skillMapEntry),
             callback: (_event, button) => ({
                 defenseAction: {
-                    label: game.i18n.localize(skillMapEntry.label),
+                    label: getSkillLabel(skillMapEntry),
                     value: skillMapEntry.name,
                     skills: [skillMapEntry.name],
                     modifier: 0,

@@ -105,6 +105,7 @@ export const WEAPON_SKILL_ATTACK_OPTIONS = {
 export const ATTACK_SKILL_OVERRIDE_MODES = {
     NONE: 'none',
     STANDARD: 'standard',
+    PROFESSION: 'profession',
     CUSTOM: 'custom'
 }
 

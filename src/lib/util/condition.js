@@ -1,3 +1,5 @@
+import { getProfessionSkills, getProfessionTree } from './professionSkill.js';
+
 const FORBIDDEN_PROPERTIES = new Set(['__proto__', 'prototype', 'constructor'])
 const CONDITION_ROOTS = new Set([
     'actor',
@@ -309,37 +311,12 @@ function isNamedSource(source, allowedTypes, expectedName) {
     return normalizeName(source.name) === normalizeName(expectedName)
 }
 
-function getProfessionTree(actor) {
-    if (!actor) return undefined
-
-    let profession
-    if (typeof actor.getList === 'function') {
-        profession = actor.getList('profession')?.[0]
-    }
-    profession ??= Array.from(actor.items ?? []).find(item => item?.type === 'profession')
-
-    return profession?.system
-}
-
 function findProfessionSkill(name, actor) {
     if (typeof name !== 'string') return undefined
     const expectedName = normalizeName(name)
     if (!expectedName) return undefined
 
     return getProfessionSkills(actor).find(skill => normalizeName(skill?.skillName) === expectedName)
-}
-
-function getProfessionSkills(actor) {
-    const professionTree = getProfessionTree(actor)
-    if (!professionTree) return []
-
-    return [
-        professionTree.definingSkill,
-        ...['skillPath1', 'skillPath2', 'skillPath3'].flatMap(path => {
-            const skillPath = professionTree[path]
-            return [skillPath?.skill1, skillPath?.skill2, skillPath?.skill3]
-        })
-    ]
 }
 
 function getProfessionSkillRank(name, actor) {

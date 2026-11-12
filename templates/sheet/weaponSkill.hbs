@@ -80,39 +80,59 @@
             <p class="hint">Choose whether this skill is used for melee or ranged attacks.</p>
         </div>
 
-        {{#if hasMeleeAttack}}
-        <h3>{{localize "WITCHER.Attack.attackOptions.melee"}}</h3>
+        <div class="form-group stacked">
+            <label id="{{item.id}}-attack-skill-source">{{localize "WTTRPGEnhancements.WeaponSkill.AttackSkillSource"}}</label>
+            <div class="checkbox-group" role="radiogroup" aria-labelledby="{{item.id}}-attack-skill-source">
+                {{#each attackSkillSources}}
+                <label class="checkbox">
+                    <input type="radio" name="system.attackSkillOverrideMode" value="{{this.value}}" {{checked this.checked}}>
+                    <span>{{localize this.label}}</span>
+                </label>
+                {{/each}}
+            </div>
+        </div>
+
+        {{#if usesDefaultAttackSkill}}
+            {{#if hasMeleeAttack}}
+            <div class="form-group">
+                <label for="{{item.id}}-default-attack-skill">{{localize "WITCHER.Attack.meleeAttackSkill.label"}}</label>
+                <select id="{{item.id}}-default-attack-skill" name="system.meleeAttackSkill">
+                    {{selectOptions meleeAttackSkills selected=item.system.meleeAttackSkill valueAttr="name" labelAttr="label" localize=true}}
+                </select>
+            </div>
+            {{else}}
+            <div class="form-group">
+                <label for="{{item.id}}-default-attack-skill">{{localize "WITCHER.Attack.rangedAttackSkill.label"}}</label>
+                <select id="{{item.id}}-default-attack-skill" name="system.rangedAttackSkill">
+                    {{selectOptions rangedAttackSkills selected=item.system.rangedAttackSkill valueAttr="name" labelAttr="label" localize=true}}
+                </select>
+            </div>
+            {{/if}}
+        {{else if usesStandardAttackSkill}}
         <div class="form-group">
-            <label>{{localize "WITCHER.Attack.meleeAttackSkill.label"}}</label>
-            <select name="system.meleeAttackSkill">
-                {{selectOptions meleeAttackSkills selected=item.system.meleeAttackSkill valueAttr="name" labelAttr="label" localize=true}}
+            <label for="{{item.id}}-standard-attack-skill">{{localize "WTTRPGEnhancements.WeaponSkill.AnotherAttackSkillLabel"}}</label>
+            <select id="{{item.id}}-standard-attack-skill" name="system.attackSkillOverride">
+                <option value="">{{localize "WTTRPGEnhancements.WeaponSkill.ChooseAttackSkill"}}</option>
+                {{selectOptions attackSkillOverrideOptions selected=item.system.attackSkillOverrideKey valueAttr="value" labelAttr="label"}}
             </select>
         </div>
+        {{else}}
+        <div class="form-group">
+            <label for="{{item.id}}-profession-attack-skill">{{localize "WTTRPGEnhancements.WeaponSkill.ProfessionAttackSkillLabel"}}</label>
+            <select id="{{item.id}}-profession-attack-skill" name="system.professionAttackSkill">
+                <option value="">{{localize "WTTRPGEnhancements.WeaponSkill.ChooseAttackSkill"}}</option>
+                {{selectOptions professionAttackSkillOptions selected=item.system.professionAttackSkill valueAttr="value" labelAttr="label"}}
+            </select>
+            <p class="hint">{{localize "WTTRPGEnhancements.WeaponSkill.ProfessionAttackSkillHint"}}</p>
+        </div>
+        {{/if}}
+
+        {{#if hasMeleeAttack}}
         <div class="form-group">
             <label>{{localize "WITCHER.Weapon.MeleeBonus"}}</label>
             <input name="system.applyMeleeBonus" type="checkbox" {{checked item.system.applyMeleeBonus}}>
         </div>
         {{/if}}
-
-        {{#if hasRangedAttack}}
-        <h3>{{localize "WITCHER.Attack.attackOptions.ranged"}}</h3>
-        <div class="form-group">
-            <label>{{localize "WITCHER.Attack.rangedAttackSkill.label"}}</label>
-            <select name="system.rangedAttackSkill">
-                {{selectOptions rangedAttackSkills selected=item.system.rangedAttackSkill valueAttr="name" labelAttr="label" localize=true}}
-            </select>
-        </div>
-        {{/if}}
-
-        <div class="form-group">
-            <label>{{localize "WTTRPGEnhancements.WeaponSkill.AttackSkillOverrideLabel"}}</label>
-            <select name="system.attackSkillOverride">
-                {{#each attackSkillOverrideOptions}}
-                <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
-                {{/each}}
-            </select>
-            <p class="hint">{{localize "WTTRPGEnhancements.WeaponSkill.AttackSkillOverrideHint"}}</p>
-        </div>
         <div class="form-group stacked">
             <label>{{localize "WTTRPGEnhancements.WeaponSkill.TargetLocationsLabel"}}</label>
             <div class="checkbox-group weapon-skill-sheet__checkbox-group">

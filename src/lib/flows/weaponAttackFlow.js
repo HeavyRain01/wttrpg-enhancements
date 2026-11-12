@@ -1,12 +1,14 @@
 import { getAttachedWeaponSkillsSync, isWeaponSkill } from '../util/weaponSkillAttachment.js';
-import { ATTACK_MODES, TEMPLATE_PATHS, WEAPON_SKILL_ATTACK_OPTIONS } from '../util/constants.js';
+import { ATTACK_MODES, ATTACK_SKILL_OVERRIDE_MODES, SITUATIONAL_BONUS_SCOPES, TEMPLATE_PATHS, WEAPON_SKILL_ATTACK_OPTIONS } from '../util/constants.js';
 import {
+    getWeaponSkillAttackSource,
     getWeaponSkillEffectiveAttackSkill,
     getWeaponSkillParentWeapon,
     withWeaponSkillNativeAttackOverride
 } from '../util/weaponSkill.js';
 import { getCurrentTargetActor, isWeaponSkillAvailable } from '../util/weaponSkillAvailability.js';
-import { SITUATIONAL_BONUS_SCOPES } from '../util/constants.js';
+import { getProfessionSkills } from '../util/professionSkill.js';
+import { getSkillLabel } from '../util/skillLabel.js';
 import { appendFormula, renderSituationalBonusCards, selectedBonusFormula } from '../util/situationalBonus.js';
 
 const { DialogV2 } = foundry.applications.api;
@@ -170,8 +172,10 @@ function formatAttackMode(skill) {
 
 function formatAttackSkill(skill) {
     const skillName = getWeaponSkillEffectiveAttackSkill(skill.system);
+    if (getWeaponSkillAttackSource(skill.system) === ATTACK_SKILL_OVERRIDE_MODES.PROFESSION) return skillName || '-';
+
     return CONFIG.WITCHER?.skillMap?.[skillName]?.label
-        ? game.i18n.localize(CONFIG.WITCHER.skillMap[skillName].label)
+        ? getSkillLabel(CONFIG.WITCHER.skillMap[skillName])
         : skillName || '-';
 }
 
@@ -283,7 +287,7 @@ async function showWeaponSkillInfoDialog(skillUuid) {
     }).render({ force: true });
 }
 
-async function withFilteredWeaponAttackDialog(skill, callback) {
+async function withFilteredWeaponAttackDialog(skill, callback, attackModifiers = '') {
     const allowedLocations = getAllowedTargetLocations(skill);
     const allowedDamageTypes = getAllowedDamageTypes(skill);
     const allowedStrikes = getAllowedStrikes(skill);
@@ -293,7 +297,7 @@ async function withFilteredWeaponAttackDialog(skill, callback) {
         [SITUATIONAL_BONUS_SCOPES.ATTACK, SITUATIONAL_BONUS_SCOPES.DAMAGE],
         { source: skill, target: getCurrentTargetActor() }
     );
-    if (!allowedLocations.length && !allowedStrikes.length && !allowedDamageTypes.length && !bonusCards) return callback();
+    if (!allowedLocations.length && !allowedStrikes.length && !allowedDamageTypes.length && !bonusCards && !attackModifiers) return callback();
 
     const originalPrompt = DialogV2.prompt.bind(DialogV2);
     DialogV2.prompt = function patchedPrompt(config = {}) {
@@ -315,7 +319,7 @@ async function withFilteredWeaponAttackDialog(skill, callback) {
                     const damageFormula = selectedBonusFormula(button.form, SITUATIONAL_BONUS_SCOPES.DAMAGE);
                     const result = await originalCallback?.(event, button, dialog);
                     if (result) {
-                        result.customAtt = appendFormula(result.customAtt, attackFormula);
+                        result.customAtt = appendFormula(result.customAtt, attackModifiers + attackFormula);
                         result.customDmg = appendFormula(result.customDmg, damageFormula);
                     }
                     return result;
@@ -332,11 +336,11 @@ async function withFilteredWeaponAttackDialog(skill, callback) {
 }
 
 export async function wrapWeaponAttack(wrapped, weapon, options = {}) {
+    if (isWeaponSkill(weapon)) {
+        return rollWeaponSkill(wrapped, weapon, this, options);
+    }
     if (!weapon || options.skipWeaponSkillChooser) {
         return wrapped(weapon, options);
-    }
-    if (isWeaponSkill(weapon)) {
-        return withFilteredWeaponAttackDialog(weapon, () => wrapped(weapon, { ...options, skipWeaponSkillChooser: true }));
     }
 
     const attachedSkills = getAttachedWeaponSkillsSync(weapon);
@@ -374,23 +378,47 @@ export async function wrapWeaponAttack(wrapped, weapon, options = {}) {
         });
     }
 
-    const staminaCost = getSkillStaminaCost(chosenSkill);
-    const actor = weapon.actor;
+    return rollWeaponSkill(wrapped, chosenSkill, this, options);
+}
+
+async function rollWeaponSkill(wrapped, skill, actor, options) {
+    const attackOptions = { ...options, skipWeaponSkillChooser: true };
+    const source = getWeaponSkillAttackSource(skill.system);
+    const skillName = getWeaponSkillEffectiveAttackSkill(skill.system);
+    if (source !== ATTACK_SKILL_OVERRIDE_MODES.NONE && !skillName) {
+        return ui.notifications.warn(game.i18n.format(
+            'WTTRPGEnhancements.WeaponSkill.AttackSkillSelectionRequired',
+            { skill: skill.name }
+        ));
+    }
+
+    const usesProfessionSkill = source === ATTACK_SKILL_OVERRIDE_MODES.PROFESSION;
+    let attackModifiers = '';
+    if (usesProfessionSkill) {
+        const professionSkill = getProfessionSkills(actor).find(entry => entry?.skillName === skillName);
+        const stat = professionSkill?.stat;
+        if (!stat || !CONFIG.WITCHER?.statMap?.[stat] || actor.system?.stats?.[stat]?.value == null) {
+            return ui.notifications.warn(game.i18n.format(
+                'WTTRPGEnhancements.WeaponSkill.ProfessionAttackSkillUnavailable',
+                { actor: actor.name, skill: skillName }
+            ));
+        }
+
+        attackOptions.skillReplacement = { skillName, stat, level: professionSkill.level };
+        // The system's replacement skill path skips the actor's general attack modifiers.
+        attackModifiers = actor.addAttackModifiers();
+    }
+
+    const staminaCost = getSkillStaminaCost(skill);
     const currentStamina = Number(actor?.system?.derivedStats?.sta?.value);
     if (staminaCost > 0 && (!Number.isFinite(currentStamina) || currentStamina < staminaCost)) {
         return ui.notifications.error(game.i18n.localize('WITCHER.Spell.notEnoughSta'));
     }
 
-    const result = await withSkillAttackCount(chosenSkill, () => {
-        return withFilteredWeaponAttackDialog(chosenSkill, () => {
-            return withWeaponSkillNativeAttackOverride(chosenSkill, activeWeapon => {
-                return wrapped(activeWeapon, {
-                    ...options,
-                    skipWeaponSkillChooser: true
-                });
-            });
-        });
-    });
+    const roll = usesProfessionSkill
+        ? () => wrapped(skill, attackOptions)
+        : () => withWeaponSkillNativeAttackOverride(skill, activeWeapon => wrapped(activeWeapon, attackOptions));
+    const result = await withSkillAttackCount(skill, () => withFilteredWeaponAttackDialog(skill, roll, attackModifiers));
 
     if (staminaCost > 0) {
         await actor.update({
