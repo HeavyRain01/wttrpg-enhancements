@@ -77,6 +77,7 @@ jobs:
         uses: djlechuck/foundryvtt-publish-package-action@v1
         with:
           token: ${{ secrets.FOUNDRYVTT_RELEASE_TOKEN }}
+          id: wttrpg-enchantments
           manifest: https://github.com/${{ github.repository }}/releases/download/${{ inputs.tag || github.event.release.tag_name || github.ref_name }}/module.json
           notes: https://github.com/${{ github.repository }}/releases/tag/${{ inputs.tag || github.event.release.tag_name || github.ref_name }}
       - name: Diagnose Foundry publishing failure
@@ -94,7 +95,7 @@ jobs:
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: token },
             body: JSON.stringify({
-              id: manifest.id,
+              id: 'wttrpg-enchantments',
               'dry-run': true,
               release: {
                 version: manifest.version,
