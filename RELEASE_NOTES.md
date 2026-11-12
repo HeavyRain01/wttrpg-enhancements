@@ -1,5 +1,11 @@
 # WTTRPG Enhancements release notes
 
+## 0.0.24 - Weapon Skill Attack Options
+
+- Weapon skills can use a Profession skill's governing stat and rank for attacks. Choose between the default attack skill, another standard skill, or a Profession skill in the weapon skill settings.
+- Fixed Pick Lock and Trap Crafting labels in weapon skill attack and defense options.
+- Releases are now packaged automatically when a version tag is pushed, with optional publishing to Foundry.
+
 ## 0.0.23 - Situational Bonus Dialog Layout
 
 - Attack, spell, skill-check, and Apply Damage dialogs now scroll their content while keeping confirmation buttons visible, even with many situational bonuses.

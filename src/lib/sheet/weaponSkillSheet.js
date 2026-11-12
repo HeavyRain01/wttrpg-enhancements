@@ -1,9 +1,11 @@
-import { getWeaponSkillParentWeapon } from '../util/weaponSkill.js';
+import { getWeaponSkillAttackSource, getWeaponSkillParentWeapon } from '../util/weaponSkill.js';
 import { ATTACK_MODES, ATTACK_SKILL_OVERRIDE_MODES, FLAG_KEYS, MODULE, TEMPLATE_PATHS, WEAPON_SKILL_DEFAULTS } from '../util/constants.js';
 import { LifeStealMixin } from '../mixin/lifestealMixin.js';
 import { ItemSituationalBonusMixin } from '../mixin/itemSituationalBonusMixin.js';
 import { getSpecificLocationOptions } from '../util/location.js';
 import { bindConditionAutocomplete } from '../util/conditionAutocomplete.js';
+import { getProfessionSkills } from '../util/professionSkill.js';
+import { getSkillLabel } from '../util/skillLabel.js';
 
 const { ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -87,14 +89,6 @@ export default class WeaponSkillSheet extends ItemSituationalBonusMixin(LifeStea
             ?? null;
     }
 
-    static parseAttackSkillOverride(value) {
-        if (!value) return { mode: ATTACK_SKILL_OVERRIDE_MODES.NONE, key: '' };
-        return {
-            mode: ATTACK_SKILL_OVERRIDE_MODES.STANDARD,
-            key: value
-        };
-    }
-
     static normalizeArrayValue(value, fallback = []) {
         if (Array.isArray(value)) return value.filter(entry => entry !== undefined && entry !== null && entry !== '');
         if (value && typeof value === 'object') {
@@ -115,9 +109,14 @@ export default class WeaponSkillSheet extends ItemSituationalBonusMixin(LifeStea
         const currentAttackMode = Array.from(this.document.system.attackOptions ?? [])[0] ?? ATTACK_MODES.MELEE;
         const attackMode = data.system?.attackMode ?? currentAttackMode;
         const isRanged = attackMode === ATTACK_MODES.RANGED;
-        const attackSkillOverride = WeaponSkillSheet.parseAttackSkillOverride(data.system?.attackSkillOverride ?? '');
         const lifestealData = data.lifesteal ?? {};
         const systemData = data.system ?? {};
+        const currentAttackSource = getWeaponSkillAttackSource(this.document.system);
+        const attackSource = systemData.attackSkillOverrideMode ?? currentAttackSource;
+        const savedStandardSkill = currentAttackSource === ATTACK_SKILL_OVERRIDE_MODES.STANDARD
+            ? this.document.system.attackSkillOverrideKey
+            : '';
+        const savedRangedSkill = this.document._source.system.rangedAttackSkill ?? this.document.system.rangedAttackSkill;
 
         const updateData = {
             name: data.name ?? this.document.name,
@@ -172,9 +171,14 @@ export default class WeaponSkillSheet extends ItemSituationalBonusMixin(LifeStea
                 ))),
                 attackOptions: [attackMode],
                 meleeAttackSkill: systemData.meleeAttackSkill ?? this.document.system.meleeAttackSkill ?? '',
-                rangedAttackSkill: isRanged ? (systemData.rangedAttackSkill ?? this.document.system.rangedAttackSkill ?? '') : '',
-                attackSkillOverrideMode: attackSkillOverride.mode,
-                attackSkillOverrideKey: attackSkillOverride.key,
+                rangedAttackSkill: systemData.rangedAttackSkill ?? savedRangedSkill ?? '',
+                attackSkillOverrideMode: attackSource,
+                attackSkillOverrideKey: attackSource === ATTACK_SKILL_OVERRIDE_MODES.STANDARD
+                    ? (systemData.attackSkillOverride ?? savedStandardSkill ?? '')
+                    : '',
+                professionAttackSkill: attackSource === ATTACK_SKILL_OVERRIDE_MODES.PROFESSION
+                    ? (systemData.professionAttackSkill ?? this.document.system.professionAttackSkill ?? '')
+                    : '',
                 additionalDefenseSkills: WeaponSkillSheet.normalizeArrayValue(systemData.additionalDefenseSkills),
                 applyMeleeBonus: attackMode === ATTACK_MODES.MELEE ? !!systemData.applyMeleeBonus : false,
                 isThrowable: WEAPON_SKILL_DEFAULTS.IS_THROWABLE,
@@ -209,34 +213,30 @@ export default class WeaponSkillSheet extends ItemSituationalBonusMixin(LifeStea
     }
 
     buildAttackSkillOverrideOptions() {
-        const options = [{
-            value: '',
-            label: game.i18n.localize('WTTRPGEnhancements.WeaponSkill.AttackSkillOverrideDefault')
-        }];
-
-        const standardSkills = Object.values(CONFIG.WITCHER?.skillMap ?? {})
+        const options = Object.values(CONFIG.WITCHER?.skillMap ?? {})
             .map(skill => ({
                 value: skill.name,
-                label: game.i18n.localize(skill.label)
+                label: getSkillLabel(skill)
             }))
             .sort((a, b) => a.label.localeCompare(b.label));
 
-        options.push(...standardSkills);
-
-        const currentValue = this.document.system.attackSkillOverrideMode === ATTACK_SKILL_OVERRIDE_MODES.STANDARD
-            ? (this.document.system.attackSkillOverrideKey ?? '')
-            : '';
-
+        const currentValue = this.document.system.attackSkillOverrideKey;
         if (currentValue && !options.some(option => option.value === currentValue)) {
-            options.push({
-                value: currentValue,
-                label: this.document.system.attackSkillOverrideKey
-            });
+            options.push({ value: currentValue, label: currentValue });
         }
 
-        return options.map(option => ({
-            ...option,
-            selected: option.value === currentValue
+        return options;
+    }
+
+    buildProfessionAttackSkillOptions() {
+        const currentValue = this.document.system.professionAttackSkill;
+        const actor = this.document.actor ?? getWeaponSkillParentWeapon(this.document)?.actor;
+        const names = new Set(getProfessionSkills(actor).map(skill => skill?.skillName).filter(Boolean));
+        if (currentValue) names.add(currentValue);
+
+        return [...names].sort((left, right) => left.localeCompare(right)).map(name => ({
+            value: name,
+            label: name
         }));
     }
 
@@ -259,7 +259,7 @@ export default class WeaponSkillSheet extends ItemSituationalBonusMixin(LifeStea
             .filter(skill => !defaultDefenseSkills.has(skill.name))
             .map(skill => ({
                 value: skill.name,
-                label: game.i18n.localize(skill.label),
+                label: getSkillLabel(skill),
                 checked: (this.document.system.additionalDefenseSkills ?? []).includes(skill.name)
             }))
             .sort((a, b) => a.label.localeCompare(b.label));
@@ -313,7 +313,18 @@ export default class WeaponSkillSheet extends ItemSituationalBonusMixin(LifeStea
         context.attackOptions = attackOptions;
         context.targetLocations = targetLocations;
         context.allowedStrikes = allowedStrikes;
-        context.attackSkillOverrideOptions = this.buildAttackSkillOverrideOptions();
+        const attackSkillSource = getWeaponSkillAttackSource(this.document.system);
+        context.attackSkillSources = [
+            { value: ATTACK_SKILL_OVERRIDE_MODES.NONE, label: 'WTTRPGEnhancements.WeaponSkill.AttackSkillOverrideDefault' },
+            { value: ATTACK_SKILL_OVERRIDE_MODES.STANDARD, label: 'WTTRPGEnhancements.WeaponSkill.AnotherAttackSkillLabel' },
+            { value: ATTACK_SKILL_OVERRIDE_MODES.PROFESSION, label: 'WTTRPGEnhancements.WeaponSkill.ProfessionAttackSkillLabel' }
+        ].map(source => ({ ...source, checked: source.value === attackSkillSource }));
+        context.usesDefaultAttackSkill = attackSkillSource === ATTACK_SKILL_OVERRIDE_MODES.NONE;
+        context.usesStandardAttackSkill = attackSkillSource === ATTACK_SKILL_OVERRIDE_MODES.STANDARD;
+        context.attackSkillOverrideOptions = context.usesStandardAttackSkill ? this.buildAttackSkillOverrideOptions() : [];
+        context.professionAttackSkillOptions = attackSkillSource === ATTACK_SKILL_OVERRIDE_MODES.PROFESSION
+            ? this.buildProfessionAttackSkillOptions()
+            : [];
         context.selectedAttackMode = selectedAttackMode;
         context.meleeAttackSkills = meleeAttackSkills;
         context.rangedAttackSkills = rangedAttackSkills;
