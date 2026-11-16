@@ -1,5 +1,9 @@
 # WTTRPG Enhancements release notes
 
+## 0.0.26 - Campaign Timeline Extraction
+
+- Enable the standalone [Campaign Codex Timeline Widget](https://github.com/HeavyRain01/foundry-campaign-codex-timeline) to keep using timelines in Campaign Codex. Existing dates, events, and attachments stay on their hosting journals.
+
 ## 0.0.25 - Valuable Item Uses
 
 - GMs can add multiple named uses to General Valuables. Owners can open the action cards from the item sheet or the actor's inventory.

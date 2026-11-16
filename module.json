@@ -56,8 +56,7 @@
   ],
   "scripts": [],
   "styles": [
-    "styles/module.css",
-    "styles/campaign-timeline.css"
+    "styles/module.css"
   ],
   "languages": [
     {

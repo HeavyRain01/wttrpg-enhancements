@@ -153,19 +153,9 @@ The attack picker shows the weapon's normal attack alongside its skills. Skill c
 
 **Example:** A *Pommel Strike* may cost 3 Stamina, deal bludgeoning damage, use a different attack skill, and allow the defender an additional defense option. A *Whirl* technique may make a fixed number of attacks with its own accuracy penalty.
 
-### Optional Campaign Codex timeline widget
+### Campaign Codex Timeline Widget
 
-When Campaign Codex is enabled, its widget picker includes **Campaign Timeline**.
-
-- GMs with ownership can select **Edit timeline**; players see the reading view.
-- **Add date** creates a group with any date text. **Add event** adds a required time or free-text label within that date.
-- Each date and event can have a rich-text description and multiple linked Codex sheets. Drop NPCs, locations, regions, quests, factions, shops, groups, or other Codex entries into the single attachment area. Sheets group automatically by type; duplicates are ignored and existing links are preserved.
-- Use the left drag handles or arrow buttons to reorder dates and events. Events stay inside their parent date; date text is never parsed or sorted.
-- Attachment groups flow inline and wrap as space permits, with a border around each complete group and icon tooltips. In edit mode, drag a group icon to reorder groups, or a tag's handle to reorder links within its group. Drop on the left/right half of a target to insert before/after it. Focus a handle and use the arrow keys for keyboard reordering. These orders are saved separately for each date or event.
-- Select **Done** to return to the timeline view. Changes save after each action, and each widget stores its own data on its hosting journal. Linked sheets open when clicked, subject to the viewer's document permissions.
-
-The timeline's text is visible to everyone who can view its host entry. GM-only editing does not make that text secret. Campaign Codex remains optional; this integration does nothing when it is disabled.
-
+Campaign Timeline has moved to a standalone module. Enable it in your world to continue using timelines stored on existing Campaign Codex journals. [Campaign Codex Timeline Widget](https://github.com/HeavyRain01/foundry-campaign-codex-timeline)
 
 ### Optional Argon Combat HUD integration
 

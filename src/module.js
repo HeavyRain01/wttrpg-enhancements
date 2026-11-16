@@ -13,13 +13,11 @@ import { registerSettings } from "./lib/setup/settings.js";
 import { registerArgonCombatHudIntegration } from "./lib/integrations/argonCombatHud.js";
 import { wrapCustomSkillCheck, wrapProfessionSkillCheck, wrapSkillCheck } from "./lib/flows/skillCheckFlow.js";
 import { wrapCastSpell } from "./lib/flows/spellAttackFlow.js";
-import { registerCampaignTimeline } from "./lib/integrations/campaignTimeline.js";
 import { registerValuableJournals } from "./lib/integrations/valuableJournal.js";
 import { addValuableUseManager, renderValuableUses } from "./lib/integrations/valuableUse.js";
 import { registerValuableUseSettings } from "./lib/util/valuableUse.js";
 import { renderBonusDialog } from "./lib/hooks/bonusDialog.js";
 Hooks.on('renderDialogV2', renderBonusDialog);
-Hooks.once('ready', registerCampaignTimeline);
 Hooks.once('init', function () {
     console.log('The Witcher TRPG Enhancements | Initializing module')
     registerItemTypes()
