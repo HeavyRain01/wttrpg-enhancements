@@ -477,7 +477,7 @@ async function promptWeaponSkillChoice(weapon, attachedSkills) {
                 button.addEventListener('click', async event => {
                     event.preventDefault();
                     event.stopPropagation();
-                    await showWeaponSkillInfoDialog(button.dataset.skillUuid);
+                    await showWeaponSkillInfoDialog(button.dataset.infoId);
                 });
             });
         },

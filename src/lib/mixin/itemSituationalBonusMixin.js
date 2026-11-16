@@ -65,13 +65,13 @@ export const ItemSituationalBonusMixin = Superclass => class extends Superclass 
 
     static onOpenSituationalBonus(event, element) {
         event.preventDefault();
-        const bonus = this.getAttachedSituationalBonuses().find(item => item.id === element.dataset.bonusId);
+        const bonus = this.getAttachedSituationalBonuses().find(item => item.id === element.dataset.cardId);
         bonus?.sheet?.render(true);
     }
 
     static async onRemoveSituationalBonus(event, element) {
         event.preventDefault();
-        const bonus = this.getAttachedSituationalBonuses().find(item => item.id === element.dataset.bonusId);
+        const bonus = this.getAttachedSituationalBonuses().find(item => item.id === element.dataset.cardId);
         await bonus?.delete();
         this.render(true);
     }

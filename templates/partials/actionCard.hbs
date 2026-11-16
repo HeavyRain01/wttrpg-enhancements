@@ -1,0 +1,17 @@
+<article class="weapon-skills-card weapon-skills-card--choice weapon-skills-card--conditional"
+    data-condition-matches="{{entry.available}}" {{#unless entry.available}}hidden{{/unless}}>
+    <input class="weapon-skills-card__radio" type="radio" name="{{fieldName}}"
+        id="{{idPrefix}}-{{entry.id}}" value="{{entry.id}}" {{checked entry.checked}}
+        {{#unless entry.available}}disabled{{/unless}}>
+    <label class="weapon-skills-card__open" for="{{idPrefix}}-{{entry.id}}" title="{{entry.name}}">
+        <span class="weapon-skills-card__art">
+            <img class="weapon-skills-card__image" src="{{entry.img}}" alt="">
+        </span>
+        <span class="weapon-skills-card__name">{{entry.name}}</span>
+    </label>
+    <button type="button" class="weapon-skills-card__info" data-info-id="{{infoId}}"
+        title="{{localize 'WTTRPGEnhancements.WeaponSkillAttack.MoreInfo'}}"
+        aria-label="{{localize 'WTTRPGEnhancements.WeaponSkillAttack.MoreInfo'}}">
+        <i class="fas fa-circle-info" aria-hidden="true"></i>
+    </button>
+</article>

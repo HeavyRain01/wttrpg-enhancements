@@ -8,6 +8,17 @@
 
 Valuable item sheets include an **Attached journal** field. Drop a journal entry or a specific journal page into it to attach or replace the link; use the unlink button to remove it. Attachments appear beneath the item name in character inventories and in new **Send to chat** cards. Links use Foundry's normal journal permissions and do not grant access to the journal. The module injects this field without replacing system templates.
 
+### Valuable item uses
+
+On a General Valuable's item sheet, open **WTTRPG Enhancements: Item Uses** from the header menu. The GM can add, edit, or remove uses in the card grid. Each use can have an icon, a rich description, and an optional condition. Owners can open the action cards from **Use** on the item sheet or the lightning icon on its inventory row. The info button on each card opens its description. Using an item does not change its quantity.
+
+Conditions use the same expressions and autocomplete as other enhancements. `actor` is the actor carrying the item, `target` is the first targeted actor, and `source` is the Valuable. For example, `hp() < maxHp()` makes a use available to an actor below full HP. The picker can show unavailable uses for reference, and the condition is checked again when the user confirms the action.
+
+- **Run Macro:** Paste an inline script or drop an existing Macro. **GM** is the default; a player using this option needs an active GM. **Player using the item** runs locally under the user's normal Foundry macro permissions. Scripts receive `item`, `actor`, `token`, `speaker`, and `user` (the user who clicked Use). For remote execution, `game.user` and the canvas are the GM's; use the passed context for the item and actor. If you copy an item or change a linked macro's code, review and save the use on the relevant item before running it with GM privileges. For linked macros run by the GM, connect the GM client over HTTPS or localhost so it can verify the approved script. Inline scripts are stored on the item and are visible to item owners.
+- **Draw from Roll Table:** Drop a Roll Table. The draw uses Foundry's normal table permissions and posts the result to chat. For a player without edit access, use a table that draws with replacement.
+- **Apply Active Effects:** Add effects in the item's normal configuration and mark them **Apply on Self** or **Apply on Target**. A use applies the effects with the matching option to the actor carrying the item or to the user's targeted tokens. Existing On Damage uses can be edited or removed in the manager.
+- **Skill Check:** Select a standard skill or a profession skill to roll the Witcher system's normal check with the actor carrying the item. For items outside an actor's inventory, enter the profession skill name as it appears on the intended actor's profession sheet.
+
 ### Ongoing damage and healing
 
 Active Effects can deal damage or restore health automatically when a character's turn begins.

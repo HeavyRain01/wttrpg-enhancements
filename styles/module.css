@@ -1336,3 +1336,35 @@
 .wttrpg-journal-remove { flex: 0 0 28px; width: 28px; height: 28px; margin-left: auto; }
 .wttrpg-inventory-journal { font-size: 12px; margin-top: 3px; }
 .wttrpg-chat-journal { margin-top: 6px; }
+.wttrpg-use-dialog {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.wttrpg-use-field {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.wttrpg-use-dialog [hidden] {
+    display: none;
+}
+
+.wttrpg-use-field textarea {
+    font-family: monospace;
+}
+
+.valuable-details .list-controls .wttrpg-valuable-use-inline {
+    text-shadow: none;
+}
+
+.wttrpg-use-image {
+    padding: 0;
+    border: 0;
+    background: none;
+}
+
+.wttrpg-use-choices .weapon-skills-card:has(.weapon-skills-card__radio:disabled) .weapon-skills-card__open {
+    opacity: 0.5;
+    cursor: default;
+}

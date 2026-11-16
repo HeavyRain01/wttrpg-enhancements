@@ -17,3 +17,9 @@ export function getProfessionSkills(actor) {
         ])
     ];
 }
+
+export function getProfessionSkillOptions(actor, currentValue) {
+    const names = new Set(getProfessionSkills(actor).map(skill => skill?.skillName).filter(Boolean));
+    if (currentValue) names.add(currentValue);
+    return [...names].sort((left, right) => left.localeCompare(right)).map(name => ({ value: name, label: name }));
+}

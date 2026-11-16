@@ -5,6 +5,7 @@
                 <img class="weapon-skill-info-dialog__image" src="{{img}}" alt="{{name}}">
             </div>
 
+            {{#if stats}}
             <div class="weapon-skill-info-dialog__stats-card">
                 <h3 class="weapon-skill-info-dialog__stats-title">{{localize "WTTRPGEnhancements.WeaponSkillAttack.InfoStats"}}</h3>
                 <dl class="weapon-skill-info-dialog__stats-list">
@@ -16,6 +17,7 @@
                     {{/each}}
                 </dl>
             </div>
+            {{/if}}
         </div>
 
         <div class="weapon-skill-info-dialog__right">

@@ -15,6 +15,8 @@ import { wrapCustomSkillCheck, wrapProfessionSkillCheck, wrapSkillCheck } from "
 import { wrapCastSpell } from "./lib/flows/spellAttackFlow.js";
 import { registerCampaignTimeline } from "./lib/integrations/campaignTimeline.js";
 import { registerValuableJournals } from "./lib/integrations/valuableJournal.js";
+import { addValuableUseManager, renderValuableUses } from "./lib/integrations/valuableUse.js";
+import { registerValuableUseSettings } from "./lib/util/valuableUse.js";
 import { renderBonusDialog } from "./lib/hooks/bonusDialog.js";
 Hooks.on('renderDialogV2', renderBonusDialog);
 Hooks.once('ready', registerCampaignTimeline);
@@ -22,6 +24,7 @@ Hooks.once('init', function () {
     console.log('The Witcher TRPG Enhancements | Initializing module')
     registerItemTypes()
     registerSettings()
+    registerValuableUseSettings()
     registerArgonCombatHudIntegration()
     registerCustomRollClasses()
     preloadTemplates()
@@ -42,6 +45,8 @@ Hooks.once('ready', async function () {
 })
 Hooks.on('getHeaderControlsApplicationV2', addActiveEffectEnhanceOption)
 Hooks.on('getHeaderControlsApplicationV2', addItemButtonAppV2)
+Hooks.on('getHeaderControlsApplicationV2', addValuableUseManager)
+Hooks.on('renderApplicationV2', renderValuableUses)
 Hooks.on('getHeaderControlsApplicationV2', addSituationalBonusButton)
 Hooks.on('getChatMessageContextOptions', addEnhancedDamageContextOption)
 function registerCustomRollClasses() {
@@ -52,6 +57,8 @@ function registerCustomRollClasses() {
 }
 async function preloadTemplates() {
     return foundry.applications.handlebars.loadTemplates([
+        TEMPLATE_PATHS.PARTIAL_MANAGER_CARD,
+        TEMPLATE_PATHS.PARTIAL_ACTION_CARD,
         TEMPLATE_PATHS.SHEET_AMPLIFIER,
         TEMPLATE_PATHS.SHEET_LIFESTEAL,
         TEMPLATE_PATHS.SHEET_DOT,
@@ -62,10 +69,12 @@ async function preloadTemplates() {
         TEMPLATE_PATHS.SHEET_SITUATIONAL_BONUS,
         TEMPLATE_PATHS.SHEET_SITUATIONAL_BONUS_MANAGER,
         TEMPLATE_PATHS.SHEET_ITEM_SITUATIONAL_BONUS_MANAGER,
+        TEMPLATE_PATHS.SHEET_VALUABLE_USE_MANAGER,
         TEMPLATE_PATHS.DIALOG_SITUATIONAL_BONUSES,
         TEMPLATE_PATHS.DIALOG_WEAPON_SKILL_ATTACH_MODE,
         TEMPLATE_PATHS.DIALOG_WEAPON_SKILL_ATTACK_CHOICE,
         TEMPLATE_PATHS.DIALOG_WEAPON_SKILL_INFO,
+        TEMPLATE_PATHS.DIALOG_VALUABLE_USE_CHOICE,
         TEMPLATE_PATHS.DIALOG_APPLY_DAMAGE,
         TEMPLATE_PATHS.ROLL_ENHANCEMENT,
         TEMPLATE_PATHS.TOOLTIP_ENHANCEMENT
