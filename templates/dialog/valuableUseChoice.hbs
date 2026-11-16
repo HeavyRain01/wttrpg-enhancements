@@ -1,0 +1,18 @@
+<section class="weapon-skill-attack-dialog wttrpg-use-choices">
+    {{#unless hasAvailable}}
+    <p>{{localize "WTTRPGEnhancements.ValuableUse.NoneAvailable"}}</p>
+    {{/unless}}
+    <div class="weapon-skills-cards weapon-skills-cards--attack-choice">
+        {{#each uses}}
+        {{> "modules/wttrpg-enhancements/templates/partials/actionCard.hbs" entry=this fieldName="useId" idPrefix=../idPrefix infoId=this.id}}
+        {{/each}}
+    </div>
+    {{#if hasUnavailable}}
+    <div class="weapon-skill-attack-dialog__condition-controls">
+        <label class="weapon-skill-attack-dialog__condition-control">
+            <input type="checkbox" data-show-unavailable {{checked showUnavailable}}>
+            <span>{{localize "WTTRPGEnhancements.ValuableUse.ShowUnavailable"}}</span>
+        </label>
+    </div>
+    {{/if}}
+</section>

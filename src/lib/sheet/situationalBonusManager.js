@@ -60,12 +60,12 @@ export default class SituationalBonusManager extends HandlebarsApplicationMixin(
 
     static openBonus(event, element) {
         event.preventDefault();
-        this.document.items.get(element.dataset.bonusId)?.sheet?.render(true);
+        this.document.items.get(element.dataset.cardId)?.sheet?.render(true);
     }
 
     static async removeBonus(event, element) {
         event.preventDefault();
-        await this.document.deleteEmbeddedDocuments(DOCUMENT_TYPES.ITEM, [element.dataset.bonusId]);
+        await this.document.deleteEmbeddedDocuments(DOCUMENT_TYPES.ITEM, [element.dataset.cardId]);
         this.render(true);
     }
 }

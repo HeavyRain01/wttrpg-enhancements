@@ -222,7 +222,7 @@ export const WeaponSkillManagerMixin = Superclass =>
 
         static async onOpenSkill(event, element) {
             event.preventDefault();
-            const skill = await this.getSkillById(element.dataset.skillId);
+            const skill = await this.getSkillById(element.dataset.cardId);
             const sheet = skill?.sheet;
             if (!sheet) return;
 
@@ -241,7 +241,7 @@ export const WeaponSkillManagerMixin = Superclass =>
 
         static async onRemoveSkill(event, element) {
             event.preventDefault();
-            await this.detachSkill(element.dataset.skillId);
+            await this.detachSkill(element.dataset.cardId);
         }
     };
 

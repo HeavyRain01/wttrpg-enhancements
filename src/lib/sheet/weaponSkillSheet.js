@@ -4,8 +4,8 @@ import { LifeStealMixin } from '../mixin/lifestealMixin.js';
 import { ItemSituationalBonusMixin } from '../mixin/itemSituationalBonusMixin.js';
 import { getSpecificLocationOptions } from '../util/location.js';
 import { bindConditionAutocomplete } from '../util/conditionAutocomplete.js';
-import { getProfessionSkills } from '../util/professionSkill.js';
-import { getSkillLabel } from '../util/skillLabel.js';
+import { getProfessionSkillOptions } from '../util/professionSkill.js';
+import { getSkillLabel, getStandardSkillOptions } from '../util/skillLabel.js';
 
 const { ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -213,31 +213,13 @@ export default class WeaponSkillSheet extends ItemSituationalBonusMixin(LifeStea
     }
 
     buildAttackSkillOverrideOptions() {
-        const options = Object.values(CONFIG.WITCHER?.skillMap ?? {})
-            .map(skill => ({
-                value: skill.name,
-                label: getSkillLabel(skill)
-            }))
-            .sort((a, b) => a.label.localeCompare(b.label));
-
-        const currentValue = this.document.system.attackSkillOverrideKey;
-        if (currentValue && !options.some(option => option.value === currentValue)) {
-            options.push({ value: currentValue, label: currentValue });
-        }
-
-        return options;
+        return getStandardSkillOptions(this.document.system.attackSkillOverrideKey);
     }
 
     buildProfessionAttackSkillOptions() {
         const currentValue = this.document.system.professionAttackSkill;
         const actor = this.document.actor ?? getWeaponSkillParentWeapon(this.document)?.actor;
-        const names = new Set(getProfessionSkills(actor).map(skill => skill?.skillName).filter(Boolean));
-        if (currentValue) names.add(currentValue);
-
-        return [...names].sort((left, right) => left.localeCompare(right)).map(name => ({
-            value: name,
-            label: name
-        }));
+        return getProfessionSkillOptions(actor, currentValue);
     }
 
     async _prepareContext(options) {

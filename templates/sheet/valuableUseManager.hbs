@@ -1,0 +1,8 @@
+<section class="weapon-skills-manager scrollable">
+    <div class="weapon-skills-cards">
+        {{#each uses}}
+        {{> "modules/wttrpg-enhancements/templates/partials/managerCard.hbs" entry=this action="editUse" removeAction="removeUse"}}
+        {{/each}}
+        {{> "modules/wttrpg-enhancements/templates/partials/managerCard.hbs" create=true action="createUse" label="WTTRPGEnhancements.ValuableUse.Add"}}
+    </div>
+</section>

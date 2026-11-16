@@ -1,5 +1,11 @@
 # WTTRPG Enhancements release notes
 
+## 0.0.25 - Valuable Item Uses
+
+- GMs can add multiple named uses to General Valuables. Owners can open the action cards from the item sheet or the actor's inventory.
+- A use can run an inline or linked macro, draw from a Roll Table, apply Active Effects to the user or targeted tokens, or roll a standard or profession skill check. Macros default to running as GM and can be configured to run as the user.
+- Use cards support custom icons, rich descriptions, and conditions with autocomplete.
+
 ## 0.0.24 - Weapon Skill Attack Options
 
 - Weapon skills can use a Profession skill's governing stat and rank for attacks. Choose between the default attack skill, another standard skill, or a Profession skill in the weapon skill settings.

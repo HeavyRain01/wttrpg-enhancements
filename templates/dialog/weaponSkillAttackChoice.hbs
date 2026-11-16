@@ -38,35 +38,7 @@
                     </h3>
                     <div class="weapon-skills-cards weapon-skills-cards--attack-choice weapon-skill-attack-dialog__skill-choices" data-available-skills>
                         {{#each skillChoices}}
-                        <article
-                            class="weapon-skills-card weapon-skills-card--choice weapon-skills-card--conditional"
-                            data-condition-matches="{{this.available}}"
-                            {{#unless this.available}}hidden{{/unless}}
-                        >
-                            <input
-                                class="weapon-skills-card__radio"
-                                type="radio"
-                                name="selectedAttack"
-                                id="weapon-skill-choice-{{this.id}}"
-                                value="{{this.id}}"
-                                {{checked this.checked}}
-                                {{#unless this.available}}disabled{{/unless}}
-                            >
-                            <label class="weapon-skills-card__open" for="weapon-skill-choice-{{this.id}}" title="{{this.name}}">
-                                <span class="weapon-skills-card__art">
-                                    <img class="weapon-skills-card__image" src="{{this.img}}" alt="{{this.name}}">
-                                </span>
-                                <span class="weapon-skills-card__name">{{this.name}}</span>
-                            </label>
-                            <button
-                                type="button"
-                                class="weapon-skills-card__info"
-                                data-skill-uuid="{{this.uuid}}"
-                                title="{{localize 'WTTRPGEnhancements.WeaponSkillAttack.MoreInfo'}}"
-                            >
-                                <i class="fas fa-circle-info"></i>
-                            </button>
-                        </article>
+                        {{> "modules/wttrpg-enhancements/templates/partials/actionCard.hbs" entry=this fieldName="selectedAttack" idPrefix="weapon-skill-choice" infoId=this.uuid}}
                         {{/each}}
                     </div>
                 </section>
