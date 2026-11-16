@@ -1,11 +1,12 @@
 import ItemEnhancementSheet from '../sheet/itemEnhancements.js';
 import ActiveEffectsEnhancementsSheet from '../sheet/activeEffectsEnhancements.js';
 import SituationalBonusManager from '../sheet/situationalBonusManager.js';
+import { BONUS_ITEM_TYPES } from '../util/constants.js';
 
 export function addItemButtonAppV2(sheet, buttons) {
-    const enhancaeble = ['spell', 'weapon'].includes(sheet.document?.type);
+    const enhanceable = BONUS_ITEM_TYPES.includes(sheet.document?.type);
 
-    if (enhancaeble && game.user.isGM) {
+    if (enhanceable && game.user.isGM) {
         buttons.push({
             class: 'enhancement',
             icon: 'fas fa-circle-up',

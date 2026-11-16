@@ -92,13 +92,14 @@ Actors can carry optional bonuses which a player selects when making a roll. Eac
 - **Skill Check** adds its formula to standard, custom, or profession skill checks. It can apply to every skill or only selected skills.
 - **Attack** adds its formula to a weapon or spell attack roll.
 - **Damage** adds its formula to weapon or spell damage. Damage bonuses are also available in the enhanced Apply Damage dialog.
+- **Defense** adds its formula to a defense roll. Select the applicable defense types, such as Block or Dodge, or leave them all unchecked to allow every defense. The bonus picker opens after you choose your defense and any shield or weapon it uses.
 
-Bonuses attached directly to an actor are global and can apply whenever their scope and condition match. Weapons and spells can also have their own bonuses, which only appear while attacking or dealing damage with that specific item. Weapon skills recognize bonuses attached to their parent weapon.
+Bonuses attached directly to an actor are global and can apply whenever their scope and condition match. Weapon and spell bonuses apply when using those items, and weapon skills recognize attack and damage bonuses attached to their parent weapon. Carried armor and valuables can grant Defense bonuses while outside a container. For other scopes, armor must also be equipped. A shield's Defense bonuses require choosing that particular shield.
 
 The roll dialog clearly labels every available bonus with:
 
-- Its scope: Skill Check, Attack, or Damage.
-- Its origin: **Actor (Global)** or the name of its weapon or spell.
+- Its scope, such as **Defense**.
+- Its origin, shown as **Actor (Global)** or the name of its item.
 - Its formula, title, description, and artwork.
 
 Each bonus has a configurable roll-card image layout:
@@ -107,7 +108,7 @@ Each bonus has a configurable roll-card image layout:
 - **Image on Right** mirrors the panel to the right.
 - **Full Card Cover** stretches the image across the card beneath a readability gradient.
 
-Situational bonuses are Item documents. This means a GM can create reusable world or compendium bonus templates and drag copies into an actor, weapon, or spell manager. Dropping a bonus into the actor manager makes it global; dropping it onto a weapon or spell binds the copy to that item. Item-bound bonuses only support Attack and Damage scopes. When a configured world weapon or spell is added to an actor, its attached bonuses are copied with it.
+Create a global bonus in the actor's **Situational Bonuses** manager. To attach a bonus to a weapon, spell, armor, shield, or valuable, open **WTTRPG Enhancements** from the item's sheet header. You can also drag in a reusable situational-bonus item. Attached bonuses copy with their parent item when it is added to an actor.
 
 Conditions use the same safe expression engine and autocomplete as other enhancements. They can inspect the acting actor, current target, attack source, damage context, resources, Active Effects, ordinary skills, and profession abilities.
 
@@ -117,6 +118,9 @@ Conditions use the same safe expression engine and autocomplete as other enhance
 - *Specialized Training* adds `1d6` only to selected skill checks when `skillLevel('Athletics') >= 6`.
 - *Silver Edge* is attached to one sword and adds `1d6` damage only when that sword attacks.
 - *Focused Sign* is attached to one spell and improves only that spell's attack roll.
+- *Shield Brace* is attached to one shield, applies to Block, and uses the condition `sta() >= 5`. The card appears when the defender chooses that shield and has at least 5 Stamina.
+
+For Defense bonuses, `actor`, `target`, and helpers such as `sta()` refer to the defender. `attacker` is the opposing actor and `source` is the incoming attack item. A global Defense bonus can check the equipment directly with `defense.type === 'block' && defense.item.name === 'Kite Shield'`. An armor bonus can require the armor to be equipped with `item.system.equipped`, where `item` is the item providing the bonus.
 
 ### More control when applying damage
 

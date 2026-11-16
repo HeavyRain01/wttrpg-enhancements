@@ -8,6 +8,7 @@ export default class SituationalBonusData extends foundry.abstract.TypeDataModel
             imageLayout: new fields.StringField({ initial: 'left' }),
             scope: new fields.StringField({ initial: 'skill' }),
             applicableSkills: new fields.ArrayField(new fields.StringField({ initial: '' }), { initial: [] }),
+            applicableDefenses: new fields.ArrayField(new fields.StringField({ initial: '' }), { initial: [] }),
             parentItemUuid: new fields.StringField({ initial: '' }),
             condition: new fields.StringField({ initial: '' })
         };

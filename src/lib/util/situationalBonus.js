@@ -1,5 +1,5 @@
 import { evaluateCondition } from './condition.js';
-import { ITEM_TYPES, TEMPLATE_PATHS } from './constants.js';
+import { ITEM_TYPES, PASSIVE_BONUS_ITEM_TYPES, SITUATIONAL_BONUS_SCOPES, TEMPLATE_PATHS } from './constants.js';
 
 export function getSituationalBonuses(actor, scope, context = {}) {
     if (!actor) return [];
@@ -7,21 +7,46 @@ export function getSituationalBonuses(actor, scope, context = {}) {
     return Array.from(actor.items ?? []).filter(item => {
         if (item.type !== ITEM_TYPES.SITUATIONAL_BONUS || item.system?.scope !== scope) return false;
         const parentItemUuid = item.system?.parentItemUuid ?? '';
-        if (parentItemUuid && !matchesSource(context.source, parentItemUuid)) return false;
+        const parent = findBonusParent(actor, parentItemUuid);
+        if (parentItemUuid && !matchesBonusItem(parent, parentItemUuid, scope, context)) return false;
         const skillFilters = item.system?.applicableSkills ?? [];
-        if (scope === 'skill' && skillFilters.length && !matchesSkill(context.source, skillFilters)) return false;
+        if (scope === SITUATIONAL_BONUS_SCOPES.SKILL && skillFilters.length && !matchesSkill(context.source, skillFilters)) return false;
+        const defenseFilters = item.system?.applicableDefenses ?? [];
+        if (scope === SITUATIONAL_BONUS_SCOPES.DEFENSE) {
+            if (!context.defense || (defenseFilters.length && !defenseFilters.includes(context.defense.type))) return false;
+        }
         return evaluateCondition(item.system?.condition ?? '', {
-            attacker: actor,
+            actor,
+            attacker: scope === SITUATIONAL_BONUS_SCOPES.DEFENSE ? context.attacker : actor,
             target,
             source: context.source,
-            damage: context.damage
+            damage: context.damage,
+            item: parent,
+            defense: context.defense
         });
     });
 }
 
-function matchesSource(source, parentItemUuid) {
-    if (!source) return false;
-    return source.uuid === parentItemUuid || source.system?.parentWeaponUuid === parentItemUuid;
+export function matchesBonusParent(item, uuid) {
+    return Boolean(item && uuid && (item.uuid === uuid
+        || (item.actor?.isToken && uuid === `Actor.${item.actor.id}.Item.${item.id}`)));
+}
+
+function findBonusParent(actor, uuid) {
+    return uuid ? actor.items?.find(item => matchesBonusParent(item, uuid)) : null;
+}
+
+function matchesBonusItem(parent, uuid, scope, { source, defense }) {
+    if (PASSIVE_BONUS_ITEM_TYPES.includes(parent?.type)) {
+        if (parent.system.isStored || parent.system.isCarried === false) return false;
+        if (parent.type === 'valuable') return true;
+        if (scope === SITUATIONAL_BONUS_SCOPES.DEFENSE) {
+            return parent.system.location !== 'Shield' || matchesBonusParent(defense?.item, uuid);
+        }
+        return parent.system.equipped;
+    }
+    if (scope === SITUATIONAL_BONUS_SCOPES.DEFENSE) return matchesBonusParent(defense?.item, uuid);
+    return matchesBonusParent(source, uuid) || source?.system?.parentWeaponUuid === uuid;
 }
 
 function matchesSkill(source, filters) {
@@ -39,7 +64,7 @@ function matchesSkill(source, filters) {
 export async function prepareSituationalBonusCards(actor, scopes, context = {}) {
     const bonuses = scopes.flatMap(scope => getSituationalBonuses(actor, scope, context));
     const cards = await Promise.all(bonuses.map(async bonus => {
-        const parent = resolveParentItem(bonus.system.parentItemUuid);
+        const parent = findBonusParent(actor, bonus.system.parentItemUuid) ?? resolveParentItem(bonus.system.parentItemUuid);
         return {
             id: bonus.id,
             name: bonus.name,

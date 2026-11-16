@@ -3,7 +3,7 @@ import { addActiveEffectEnhanceOption, addItemButtonAppV2, addSituationalBonusBu
 import { addEnhancedDamageContextOption } from "./lib/hooks/chat.js";
 import { wrapDamageRoll } from "./lib/flows/damageRollFlow.js";
 import { wrapWeaponAttack } from "./lib/flows/weaponAttackFlow.js";
-import { wrapPrepareAndExecuteDefense } from "./lib/flows/defenseFlow.js";
+import { wrapCreateDefenseOption, wrapPrepareAndExecuteDefense, wrapSkillDefense } from "./lib/flows/defenseFlow.js";
 import { wrapAddItem } from "./lib/flows/addItemFlow.js";
 import { EnhancementRoll } from "./lib/roll/enhancementRoll.js";
 import { wrapGetLocationArmor } from "./lib/core/temporarySp.js";
@@ -33,6 +33,8 @@ Hooks.once('ready', async function () {
     libWrapper.register(MODULE.ID, "CONFIG.Item.documentClass.prototype.rollDamage", wrapDamageRoll, 'WRAPPER')
     libWrapper.register(MODULE.ID, "CONFIG.Actor.documentClass.prototype.weaponAttack", wrapWeaponAttack, 'MIXED')
     libWrapper.register(MODULE.ID, "CONFIG.Actor.documentClass.prototype.prepareAndExecuteDefense", wrapPrepareAndExecuteDefense, 'WRAPPER')
+    libWrapper.register(MODULE.ID, "CONFIG.Item.documentClass.prototype.createDefenseOption", wrapCreateDefenseOption, 'WRAPPER')
+    libWrapper.register(MODULE.ID, "CONFIG.Actor.documentClass.prototype.skillDefense", wrapSkillDefense, 'MIXED')
     libWrapper.register(MODULE.ID, "CONFIG.Actor.documentClass.prototype.addItem", wrapAddItem, 'WRAPPER')
     libWrapper.register(MODULE.ID, "CONFIG.Actor.documentClass.prototype.getLocationArmor", wrapGetLocationArmor, 'WRAPPER')
     libWrapper.register(MODULE.ID, "CONFIG.Actor.documentClass.prototype.rollSkillCheck", wrapSkillCheck, 'WRAPPER')

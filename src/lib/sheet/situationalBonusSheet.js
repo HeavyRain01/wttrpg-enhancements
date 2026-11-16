@@ -1,6 +1,6 @@
 import { bindConditionAutocomplete } from '../util/conditionAutocomplete.js';
 import { getProfessionSkills } from '../util/professionSkill.js';
-import { SITUATIONAL_BONUS_SCOPES, TEMPLATE_PATHS } from '../util/constants.js';
+import { PASSIVE_BONUS_ITEM_TYPES, SITUATIONAL_BONUS_SCOPES, TEMPLATE_PATHS } from '../util/constants.js';
 
 const { ItemSheetV2 } = foundry.applications.sheets;
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -25,6 +25,9 @@ export default class SituationalBonusSheet extends HandlebarsApplicationMixin(It
                 imageLayout: data.system?.imageLayout ?? 'left',
                 scope: data.system?.scope ?? SITUATIONAL_BONUS_SCOPES.SKILL,
                 applicableSkills: SituationalBonusSheet.normalizeArray(data.system?.applicableSkills),
+                applicableDefenses: this.document.system.scope === SITUATIONAL_BONUS_SCOPES.DEFENSE
+                    ? Array.from(form.querySelectorAll('[name="system.applicableDefenses"]:checked'), input => input.value)
+                    : this.document.system.applicableDefenses,
                 parentItemUuid: data.system?.parentItemUuid ?? this.document.system.parentItemUuid ?? '',
                 condition: data.system?.condition ?? ''
             }
@@ -42,9 +45,18 @@ export default class SituationalBonusSheet extends HandlebarsApplicationMixin(It
             value,
             label: `WTTRPGEnhancements.SituationalBonus.ImageLayout.${value}`
         }));
-        if (this.document.system.parentItemUuid) {
+        const parentUuid = this.document.system.parentItemUuid;
+        const parent = parentUuid ? await fromUuid(parentUuid) : null;
+        if (parentUuid && parent?.type && !PASSIVE_BONUS_ITEM_TYPES.includes(parent.type)) {
             context.scopes = context.scopes.filter(option => option.value !== SITUATIONAL_BONUS_SCOPES.SKILL);
         }
+        const selectedDefenses = new Set(this.document.system.applicableDefenses ?? []);
+        context.defenses = (CONFIG.WITCHER?.defenseOptions ?? []).map(defense => ({
+            value: defense.value,
+            label: game.i18n.localize(defense.label),
+            checked: selectedDefenses.has(defense.value)
+        }));
+        context.isDefense = this.document.system.scope === SITUATIONAL_BONUS_SCOPES.DEFENSE;
         const selectedSkills = new Set(this.document.system.applicableSkills ?? []);
         const standardSkills = Object.values(CONFIG.WITCHER?.skillMap ?? {}).map(skill => ({
             value: skill.name,

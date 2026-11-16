@@ -7,6 +7,8 @@ const CONDITION_ROOTS = new Set([
     'target',
     'damage',
     'source',
+    'item',
+    'defense',
     'professionTree'
 ])
 const WEAPON_SKILL_TYPES = new Set([
@@ -237,15 +239,16 @@ class ConditionParser {
 
 function resolveRoot(root, context) {
     if (!CONDITION_ROOTS.has(root)) throw new Error(`Unknown condition root "${root}"`)
-    return root === 'actor' ? context?.attacker : context?.[root]
+    return context?.[root]
 }
 
 function prepareConditionContext(context = {}) {
-    const attacker = context?.attacker
+    const actor = context.actor ?? context.attacker
     return {
         ...context,
-        source: context?.source ?? getDamageSource(context?.damage),
-        professionTree: context?.professionTree ?? getProfessionTree(attacker)
+        actor,
+        source: context.source ?? getDamageSource(context.damage),
+        professionTree: context.professionTree ?? getProfessionTree(actor)
     }
 }
 
@@ -269,21 +272,21 @@ function resolveProperty(value, property) {
 
 function callHelper(name, args, context) {
     const resourcePath = RESOURCE_HELPERS.get(name)
-    if (resourcePath) return getActorProperty(args[0] ?? context?.attacker, ['system', ...resourcePath])
+    if (resourcePath) return getActorProperty(args[0] ?? context.actor, ['system', ...resourcePath])
 
     switch (name) {
         case 'attribute':
-            return getAttribute(args[0], args[1] ?? context?.attacker, 'value')
+            return getAttribute(args[0], args[1] ?? context.actor, 'value')
         case 'maxAttribute':
-            return getAttribute(args[0], args[1] ?? context?.attacker, 'max')
+            return getAttribute(args[0], args[1] ?? context.actor, 'max')
         case 'stat':
-            return getActorProperty(args[1] ?? context?.attacker, ['system', 'stats', args[0], 'value'])
+            return getActorProperty(args[1] ?? context.actor, ['system', 'stats', args[0], 'value'])
         case 'skillLevel':
-            return getSkillLevel(args[0], args[1] ?? context?.attacker)
+            return getSkillLevel(args[0], args[1] ?? context.actor)
         case 'hasActiveEffect':
-            return Boolean(findActiveEffect(args[0], args[1] ?? context?.attacker))
+            return Boolean(findActiveEffect(args[0], args[1] ?? context.actor))
         case 'getActiveEffect':
-            return findActiveEffect(args[0], args[1] ?? context?.attacker)
+            return findActiveEffect(args[0], args[1] ?? context.actor)
         case 'armor':
             return getArmor(args, context)
         case 'isSourceAWeaponSkill':
@@ -291,13 +294,13 @@ function callHelper(name, args, context) {
         case 'isSourceAWeapon':
             return isNamedSource(context?.source, new Set(['weapon']), args[0])
         case 'professionTree':
-            return getProfessionTree(args[0] ?? context?.attacker)
+            return getProfessionTree(args[0] ?? context.actor)
         case 'professionSkill':
-            return findProfessionSkill(args[0], args[1] ?? context?.attacker)
+            return findProfessionSkill(args[0], args[1] ?? context.actor)
         case 'professionSkillRank':
-            return getProfessionSkillRank(args[0], args[1] ?? context?.attacker)
+            return getProfessionSkillRank(args[0], args[1] ?? context.actor)
         case 'professionSkillPoints':
-            return getProfessionSkillPoints(args[0] ?? context?.attacker)
+            return getProfessionSkillPoints(args[0] ?? context.actor)
         case 'hasProfessionSkill':
             return hasProfessionSkill(args, context)
         default:
@@ -346,7 +349,7 @@ function hasProfessionSkill(args, context) {
     const [name, rankOrActor, actorArg] = args
     const rankWasOmitted = rankOrActor == null || typeof rankOrActor === 'object'
     const minimumRank = rankWasOmitted ? 1 : Number(rankOrActor)
-    const actor = (rankWasOmitted ? rankOrActor : actorArg) ?? context?.attacker
+    const actor = (rankWasOmitted ? rankOrActor : actorArg) ?? context.actor
     return getProfessionSkillRank(name, actor) >= (Number.isFinite(minimumRank) ? minimumRank : 1)
 }
 
@@ -416,7 +419,7 @@ function getArmor(args, context) {
         location = undefined
     }
 
-    actor ??= context?.target ?? context?.attacker
+    actor ??= context.target ?? context.actor
     location ??= context?.damage?.location
     const locationName = normalizeArmorLocation(location)
     if (!actor || !locationName || typeof actor.getLocationArmor !== 'function') return undefined

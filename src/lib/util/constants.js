@@ -94,8 +94,12 @@ export const ITEM_TYPES = {
 export const SITUATIONAL_BONUS_SCOPES = {
     SKILL: 'skill',
     ATTACK: 'attack',
-    DAMAGE: 'damage'
+    DAMAGE: 'damage',
+    DEFENSE: 'defense'
 }
+
+export const PASSIVE_BONUS_ITEM_TYPES = ['armor', 'valuable'];
+export const BONUS_ITEM_TYPES = ['weapon', 'spell', ...PASSIVE_BONUS_ITEM_TYPES];
 
 export const ATTACK_MODES = {
     MELEE: 'melee',

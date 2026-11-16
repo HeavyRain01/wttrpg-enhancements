@@ -276,7 +276,7 @@ export default class WeaponSkillSheet extends ItemSituationalBonusMixin(LifeStea
 
         context.item = this.document;
         context.document = this.document;
-        context.attachedSituationalBonuses = this.getAttachedSituationalBonuses().map(bonus => ({
+        context.attachedSituationalBonuses = (await this.getAttachedSituationalBonuses()).map(bonus => ({
             id: bonus.id, name: bonus.name, img: bonus.img, scope: bonus.system.scope
         }));
         this._prepareLifestealtContext(context);

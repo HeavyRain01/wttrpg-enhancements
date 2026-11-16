@@ -1,6 +1,7 @@
 const MAX_VISIBLE_COMPLETIONS = 10;
 const DEFAULT_SCOPE = 'full';
 const WEAPON_SKILL_SCOPE = 'weapon-skill';
+const DEFENSE_SCOPE = 'defense';
 const ALL_SCOPES = [DEFAULT_SCOPE, WEAPON_SKILL_SCOPE];
 let autocompleteId = 0;
 
@@ -141,6 +142,16 @@ const COMPLETIONS = [
     ...HELPER_COMPLETIONS,
     ...PROPERTY_COMPLETIONS,
     ...FULL_PROPERTY_COMPLETIONS,
+    createCompletion('item.system.equipped', 'WTTRPGEnhancements.ConditionAutocomplete.BonusItemEquipped', {
+        scopes: [DEFENSE_SCOPE],
+        priority: 10
+    }),
+    ...['defense.type', 'defense.skill', 'defense.item', 'defense.item.name', 'defense.item.uuid'].map(property =>
+        createCompletion(property, 'WTTRPGEnhancements.ConditionAutocomplete.Defense', {
+            scopes: [DEFENSE_SCOPE],
+            priority: 10
+        })
+    ),
     ...LITERAL_COMPLETIONS
 ];
 
@@ -206,7 +217,8 @@ export function getConditionCompletions(value, cursor, scope = DEFAULT_SCOPE) {
 
     const query = fragment.text.toLocaleLowerCase();
     const items = COMPLETIONS
-        .filter(completion => completion.scopes.includes(scope))
+        .filter(completion => completion.scopes.includes(scope)
+            || (scope === DEFENSE_SCOPE && completion.scopes.includes(DEFAULT_SCOPE)))
         .map(completion => ({
             completion,
             score: getMatchScore(completion, query)

@@ -1,5 +1,12 @@
 # WTTRPG Enhancements release notes
 
+## 0.0.27 - Situational Defense Bonuses
+
+- Add situational bonuses to armor, shields, and valuables through the item sheet's enhancements menu.
+- Create actor-wide or item-attached **Defense** bonuses and select the defense types they apply to, including Dodge, Reposition, Block, and Parry.
+- Pick applicable bonuses after choosing the defense and any shield or weapon it uses. Conditions can inspect the defender, the incoming attack, and the chosen defense.
+- Carried armor can grant Defense bonuses while unequipped. Use `item.system.equipped` to require wearing the armor.
+
 ## 0.0.26 - Campaign Timeline Extraction
 
 - Enable the standalone [Campaign Codex Timeline Widget](https://github.com/HeavyRain01/foundry-campaign-codex-timeline) to keep using timelines in Campaign Codex. Existing dates, events, and attachments stay on their hosting journals.

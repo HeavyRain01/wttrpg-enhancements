@@ -203,9 +203,11 @@
                                "ConditionAutocomplete":  {
                                                                "Actor":  "The actor evaluated as actor (the attacker or weapon owner).",
                                                                "Target":  "The currently targeted actor.",
-                                                               "Attacker":  "Explicit attacker alias for actor.",
+                                                               "Attacker":  "The attacker. In a defense condition, this is the opponent.",
                                                                "Damage":  "Current damage context, including amount, type, location, and properties.",
                                                                "Source":  "Item which caused the current damage or effect.",
+                                                               "Defense": "The selected defense type, skill, or item.",
+                                                               "BonusItemEquipped": "Whether the item providing this bonus is equipped.",
                                                                "ProfessionTree":  "The attacker\u0027s profession data.",
                                                                "Resource":  "Current resource value; pass target to read the target instead of actor.",
                                                                "MaximumResource":  "Maximum resource value; pass target to read the target instead of actor.",
@@ -350,12 +352,17 @@
                                                           "ImageLayout": { "left": "Image on Left", "right": "Image on Right", "cover": "Full Card Cover" },
                                                           "ApplicableSkills": "Applicable Skills",
                                                           "ApplicableSkillsHint": "Select the skill checks this bonus applies to. Leave every skill unchecked to allow all skill checks.",
+                                                          "ApplicableDefenses": "Applicable Defenses",
+                                                          "ApplicableDefensesHint": "Select the defense types this bonus applies to. Leave them all unchecked to allow any defense.",
                                                           "StandardSkills": "Standard Skills",
                                                           "CustomSkills": "Custom Skills",
                                                           "Skills": "Skills",
                                                           "ProfessionSkills": "Profession Skills",
                                                           "Condition": "Availability Condition",
                                                           "ConditionHint": "Optional condition using actor, target, source, and damage. Leave blank to make this bonus always available.",
+                                                          "DefenseConditionHint": "In defense conditions, actor and target are the defender, attacker is the opponent, and source is the incoming attack item. Use defense.type, defense.skill, and defense.item for the chosen defense. To require the armor providing the bonus to be equipped, use item.system.equipped.",
+                                                          "DefenseTitle": "Defense Bonuses",
+                                                          "RollDefense": "Roll Defense",
                                                           "Available": "Situational Bonuses",
                                                           "BonusLabel": "Bonus",
                                                           "FormulaHint": "When selected, this formula is added to the {scope} roll or total. Dice are rolled when the bonus is applied.",
@@ -364,9 +371,9 @@
                                                           "NewBonus": "New Bonus",
                                                           "DropTitle": "Drop a situational-bonus template here",
                                                           "DropHint": "A copied version will be attached to {actor}",
-                                                          "ItemDropHint": "A copied attack/damage bonus will be attached to {item}",
+                                                          "ItemDropHint": "A copy of the bonus will be attached to {item}",
                                                           "OnlyBonuses": "Only situational-bonus items can be attached here.",
-                                                          "Scope": { "skill": "Skill Check", "attack": "Attack", "damage": "Damage" }
+                                                          "Scope": { "skill": "Skill Check", "attack": "Attack", "damage": "Damage", "defense": "Defense" }
                                                       },
                                "Misc":  {
                                             "Enhanced":  "enhanced"

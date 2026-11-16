@@ -1,5 +1,5 @@
 import { cloneAttachedWeaponSkillsToActor } from '../util/weaponSkillAttachment.js';
-import { ITEM_TYPES } from '../util/constants.js';
+import { BONUS_ITEM_TYPES, ITEM_TYPES } from '../util/constants.js';
 import { cloneAttachedSituationalBonusesToActor } from '../mixin/itemSituationalBonusMixin.js';
 
 export async function wrapAddItem(wrapped, addItem, numberOfItem, forcecreate = false) {
@@ -8,19 +8,19 @@ export async function wrapAddItem(wrapped, addItem, numberOfItem, forcecreate = 
 
     const result = await wrapped(addItem, numberOfItem, forcecreate);
 
-    if (![ITEM_TYPES.WEAPON, 'spell'].includes(addItem?.type)) {
+    if (!BONUS_ITEM_TYPES.includes(addItem?.type)) {
         return result;
     }
 
-    const targetWeapon = existingItem && !forcecreate && !existingItem.system.isStored
+    const targetItem = existingItem && !forcecreate && !existingItem.system.isStored
         ? existingItem
         : this.items.find(item => !beforeIds.has(item.id) && item.name == addItem?.name && item.type == addItem?.type)
             ?? this.items.find(item => item.name == addItem?.name && item.type == addItem?.type);
 
-    if (targetWeapon && addItem?.type === ITEM_TYPES.WEAPON) {
-        await cloneAttachedWeaponSkillsToActor(addItem, this, targetWeapon);
+    if (targetItem && addItem?.type === ITEM_TYPES.WEAPON) {
+        await cloneAttachedWeaponSkillsToActor(addItem, this, targetItem);
     }
-    if (targetWeapon) await cloneAttachedSituationalBonusesToActor(addItem, this, targetWeapon);
+    if (targetItem) await cloneAttachedSituationalBonusesToActor(addItem, this, targetItem);
 
     return result;
 }

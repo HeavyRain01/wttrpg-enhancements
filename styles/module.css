@@ -612,6 +612,7 @@
 .situational-bonus-card__badge--attack { color: #ffca75; border-color: rgba(255, 177, 61, 0.55); }
 .situational-bonus-card__badge--damage { color: #ff8c8c; border-color: rgba(255, 99, 99, 0.55); }
 .situational-bonus-card__badge--skill { color: #90d7ff; border-color: rgba(75, 179, 239, 0.55); }
+.situational-bonus-card__badge--defense { color: #a8eddf; border-color: rgba(100, 194, 179, 0.55); }
 .situational-bonus-card__badge--item { color: #d8b4ff; border-color: rgba(174, 112, 235, 0.55); }
 .situational-bonus-card__badge--actor { color: #aee6b1; border-color: rgba(102, 190, 110, 0.55); }
 

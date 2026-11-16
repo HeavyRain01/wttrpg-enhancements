@@ -1,7 +1,7 @@
 import { LifeStealMixin } from '../mixin/lifestealMixin.js';
 import { WeaponSkillManagerMixin } from '../mixin/weaponSkillManagerMixin.js';
 import { ItemSituationalBonusMixin } from '../mixin/itemSituationalBonusMixin.js';
-import { FORM_PREFIXES, ENHANCEMENT_KEYS, TEMPLATE_PATHS } from '../util/constants.js';
+import { FORM_PREFIXES, ENHANCEMENT_KEYS, PASSIVE_BONUS_ITEM_TYPES, TEMPLATE_PATHS } from '../util/constants.js';
 import DefauldDocumentSheet from './defaultSheet.js';
 
 export default class ItemEnhancementSheet extends ItemSituationalBonusMixin(WeaponSkillManagerMixin(LifeStealMixin(DefauldDocumentSheet))) {
@@ -62,12 +62,13 @@ export default class ItemEnhancementSheet extends ItemSituationalBonusMixin(Weap
     /** @override */
     _configureRenderOptions(options) {
         super._configureRenderOptions(options);
-        options.parts = ['tabs', ENHANCEMENT_KEYS.LIFESTEAL]
-
-        if (this.document?.type === 'weapon') { 
-            options.parts.push(ENHANCEMENT_KEYS.WEAPON_SKILL)
+        if (this.isPassiveBonusItem()) {
+            options.parts = [ENHANCEMENT_KEYS.SITUATIONAL_BONUS];
+            return;
         }
-        if (['weapon', 'spell'].includes(this.document?.type)) options.parts.push(ENHANCEMENT_KEYS.SITUATIONAL_BONUS)
+        options.parts = ['tabs', ENHANCEMENT_KEYS.LIFESTEAL];
+        if (this.isWeaponDocument()) options.parts.push(ENHANCEMENT_KEYS.WEAPON_SKILL);
+        options.parts.push(ENHANCEMENT_KEYS.SITUATIONAL_BONUS);
     };
 
     static async saveData(event, form, formData) {
@@ -89,9 +90,13 @@ export default class ItemEnhancementSheet extends ItemSituationalBonusMixin(Weap
         const context = await super._prepareContext(options);
 
         context.document = this.document;
-        context.attachedSituationalBonuses = this.getAttachedSituationalBonuses().map(bonus => ({
+        context.attachedSituationalBonuses = (await this.getAttachedSituationalBonuses()).map(bonus => ({
             id: bonus.id, name: bonus.name, img: bonus.img, scope: bonus.system.scope
         }));
+        if (this.isPassiveBonusItem()) {
+            context.tabs = { [ENHANCEMENT_KEYS.SITUATIONAL_BONUS]: { cssClass: 'active' } };
+            return context;
+        }
         this._prepareLifestealtContext(context);
 
         if (this.isWeaponDocument()) {
@@ -115,11 +120,6 @@ export default class ItemEnhancementSheet extends ItemSituationalBonusMixin(Weap
             }
             delete tabs[ENHANCEMENT_KEYS.WEAPON_SKILL];
         }
-        if (!['weapon', 'spell'].includes(this.document?.type)) {
-            tabs.primary.tabs = tabs.primary.tabs.filter(tab => tab.id !== ENHANCEMENT_KEYS.SITUATIONAL_BONUS);
-            delete tabs[ENHANCEMENT_KEYS.SITUATIONAL_BONUS];
-        }
-
         context.tabs = tabs;
         return context;
     }
@@ -159,5 +159,9 @@ export default class ItemEnhancementSheet extends ItemSituationalBonusMixin(Weap
 
     isWeaponDocument() {
         return this.document?.type === 'weapon';
+    }
+
+    isPassiveBonusItem() {
+        return PASSIVE_BONUS_ITEM_TYPES.includes(this.document?.type);
     }
 }
