@@ -1369,3 +1369,69 @@
     opacity: 0.5;
     cursor: default;
 }
+
+.monster-preset-list {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0;
+    list-style: none;
+    overflow-y: auto;
+    max-height: 55vh;
+}
+
+.monster-preset-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.monster-preset-list strong {
+    flex: 1;
+    overflow-wrap: anywhere;
+}
+
+.monster-preset-list img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.monster-preset-artwork {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: 0.5rem;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+.monster-preset-artwork label {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 0;
+    padding: 0.25rem;
+}
+
+.monster-preset-artwork img,
+.monster-preset-preview {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+}
+
+.monster-preset-artwork span {
+    grid-column: 1 / -1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.monster-preset-preview {
+    align-self: center;
+}
+
+.form-group:has(#monster-preset-image)[hidden],
+.monster-preset-preview[hidden] {
+    display: none;
+}

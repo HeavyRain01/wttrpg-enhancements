@@ -1,0 +1,51 @@
+<section class="monster-preset-manager">
+    {{#if worldActor}}
+    <p>{{localize "WTTRPGEnhancements.MonsterPresets.ActorManageHint"}}</p>
+    <div class="form-group">
+        <label for="{{placementId}}">{{localize "WTTRPGEnhancements.MonsterPresets.PlacementLabel"}}</label>
+        <div class="form-fields">
+            <select id="{{placementId}}" name="presetOnPlacement" aria-describedby="{{placementId}}-hint">
+                {{selectOptions placementChoices selected=placement}}
+            </select>
+        </div>
+        <p class="hint" id="{{placementId}}-hint">{{localize "WTTRPGEnhancements.MonsterPresets.PlacementHint"}}</p>
+    </div>
+    {{else}}
+    <p>{{localize "WTTRPGEnhancements.MonsterPresets.ManageHint"}}</p>
+    {{/if}}
+    <button type="button" data-action="create">
+        <i class="fa-solid fa-plus" inert></i> {{localize "WTTRPGEnhancements.MonsterPresets.Create"}}
+    </button>
+    {{#if presets.length}}
+    <ul class="monster-preset-list">
+        {{#each presets}}
+        <li>
+            {{#if images.length}}<img src="{{images.[0]}}" alt="">{{/if}}
+            <strong>{{name}}</strong>
+            {{#if active}}
+            <span>{{localize "WTTRPGEnhancements.MonsterPresets.Active"}}</span>
+            {{else if ../worldActor}}
+            <button type="button" data-action="switch" data-preset-id="{{id}}"
+                data-tooltip aria-label="{{localize 'WTTRPGEnhancements.MonsterPresets.LoadOnActor' name=name}}">
+                <i class="fa-solid fa-right-left" inert></i> {{localize "WTTRPGEnhancements.MonsterPresets.Load"}}
+            </button>
+            {{/if}}
+            <button type="button" data-action="edit" data-preset-id="{{id}}"
+                data-tooltip aria-label="{{localize 'WTTRPGEnhancements.MonsterPresets.Edit'}}">
+                <i class="fa-solid fa-pen" inert></i>
+            </button>
+            <button type="button" data-action="replace" data-preset-id="{{id}}"
+                data-tooltip aria-label="{{localize 'WTTRPGEnhancements.MonsterPresets.Replace'}}">
+                <i class="fa-solid fa-arrows-rotate" inert></i>
+            </button>
+            {{#if canRemove}}
+            <button type="button" data-action="remove" data-preset-id="{{id}}"
+                data-tooltip aria-label="{{localize 'WTTRPGEnhancements.MonsterPresets.Delete'}}">
+                <i class="fa-solid fa-trash" inert></i>
+            </button>
+            {{/if}}
+        </li>
+        {{/each}}
+    </ul>
+    {{/if}}
+</section>

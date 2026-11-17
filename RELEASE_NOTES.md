@@ -1,5 +1,11 @@
 # WTTRPG Enhancements release notes
 
+## 0.0.28 - Monster Presets
+
+- Save named variations of a Monster’s stats, skills, and inventory. The **Monster Presets** window starts with an editable Default preset and saves the active preset’s edits when you switch the actor to another variant.
+- Switch individual scene tokens from the Token HUD and choose from the preset’s assigned wildcard images. Applying a preset refills resources and warns you when the token is below full.
+- Set **Preset on placement** in the **Monster Presets** window to use the current actor setup, a fixed preset, or a random preset when placing new tokens.
+
 ## 0.0.27 - Situational Defense Bonuses
 
 - Add situational bonuses to armor, shields, and valuables through the item sheet's enhancements menu.

@@ -1,0 +1,23 @@
+<div class="form-group">
+    <label for="monster-preset-select">{{localize "WTTRPGEnhancements.MonsterPresets.Preset"}}</label>
+    <div class="form-fields">
+        <select id="monster-preset-select" name="presetId" autofocus>
+            {{#each choices}}
+            <option value="{{id}}" {{#if active}}selected{{/if}}>{{name}}</option>
+            {{/each}}
+        </select>
+    </div>
+</div>
+<div class="form-group" hidden>
+    <label for="monster-preset-image">{{localize "WTTRPGEnhancements.MonsterPresets.Image"}}</label>
+    <div class="form-fields">
+        <select id="monster-preset-image" name="presetImage"></select>
+    </div>
+</div>
+<img class="monster-preset-preview" alt="" hidden>
+{{#if spent}}
+<p class="notification warning" role="status">{{localize "WTTRPGEnhancements.MonsterPresets.RefillWarning"}}</p>
+{{/if}}
+{{#if linked}}
+<p class="hint">{{localize "WTTRPGEnhancements.MonsterPresets.UnlinkNotice"}}</p>
+{{/if}}

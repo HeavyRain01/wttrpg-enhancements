@@ -172,6 +172,16 @@ When the Argon core and Witcher integration modules are active:
 - Monsters without equipped weapons still receive HUD buttons for all of their non-ammunition weapons. Player characters continue to use Argon's equipped-weapon behavior.
 - Client settings can independently hide Brawling actions, Verbal Combat, and Special Attacks from the HUD.
 
+## Monster presets
+
+Open **Monster Presets** from an owned world Monster sheet’s header menu. The first time you open it, **Default preset** captures the current stats, skills, and inventory. Use **Save Current Sheet as Preset** to create a variation from the current sheet and make the copy active. Edit the sheet, then use **Switch** to save your edits and load another preset, including Default. You can rename any preset, assign artwork, or save the current sheet to a preset immediately with **Replace from Current Sheet**. Linked tokens follow the world actor’s active setup.
+
+A token’s Monster sheet can also save its current setup to the base actor’s preset list.
+
+In the world Monster’s **Monster Presets** window, use **Preset on placement** to choose **Random preset**, a specific saved preset, or **Use current actor setup**. A token placed with a preset starts unlinked and at full resources. If the preset has valid wildcard images assigned, Foundry picks one of those images on placement.
+
+Right-click a Monster token on the scene and use **Switch Monster Preset** in its Token HUD. Applying a preset refills the token’s resources to the new maxima. A linked token becomes unlinked when you apply a preset so its changes stay local to that token. If the actor’s prototype token uses wildcard artwork, assign one or more matching images to each preset and choose among them when switching.
+
 ## Where to find the features
 
 The GM can open **WTTRPG Enhancements** from the header of:

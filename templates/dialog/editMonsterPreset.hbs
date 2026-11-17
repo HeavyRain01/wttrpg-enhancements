@@ -1,0 +1,20 @@
+<div class="form-group">
+    <label for="monster-preset-name">{{localize "WTTRPGEnhancements.MonsterPresets.Name"}}</label>
+    <div class="form-fields">
+        <input type="text" id="monster-preset-name" name="presetName" value="{{existing.name}}" maxlength="80" required autofocus>
+    </div>
+</div>
+{{#if images.length}}
+<fieldset>
+    <legend>{{localize "WTTRPGEnhancements.MonsterPresets.Images"}}</legend>
+    <div class="monster-preset-artwork">
+        {{#each images}}
+        <label title="{{label}}">
+            <input type="checkbox" name="artwork" value="{{src}}" {{checked checked}} aria-label="{{label}}">
+            <img src="{{src}}" alt="" loading="lazy">
+            <span>{{label}}</span>
+        </label>
+        {{/each}}
+    </div>
+</fieldset>
+{{/if}}

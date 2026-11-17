@@ -17,6 +17,9 @@ import { registerValuableJournals } from "./lib/integrations/valuableJournal.js"
 import { addValuableUseManager, renderValuableUses } from "./lib/integrations/valuableUse.js";
 import { registerValuableUseSettings } from "./lib/util/valuableUse.js";
 import { renderBonusDialog } from "./lib/hooks/bonusDialog.js";
+import { addMonsterPresetManager } from "./lib/sheet/monsterPresetManager.js";
+import { addMonsterPresetHudControl, refreshMonsterPresetSheet } from "./lib/hooks/monsterPresetHud.js";
+import { wrapPrepareMonsterTokenCreation } from "./lib/hooks/monsterPresetPlacement.js";
 Hooks.on('renderDialogV2', renderBonusDialog);
 Hooks.once('init', function () {
     console.log('The Witcher TRPG Enhancements | Initializing module')
@@ -41,6 +44,7 @@ Hooks.once('ready', async function () {
     libWrapper.register(MODULE.ID, "CONFIG.Actor.documentClass.prototype.rollCustomSkillCheck", wrapCustomSkillCheck, 'WRAPPER')
     libWrapper.register(MODULE.ID, "CONFIG.Actor.documentClass.prototype.doProfessionSkillRoll", wrapProfessionSkillCheck, 'WRAPPER')
     libWrapper.register(MODULE.ID, "CONFIG.Actor.documentClass.prototype.castSpell", wrapCastSpell, 'WRAPPER')
+    libWrapper.register(MODULE.ID, "CONFIG.Token.documentClass.prototype._preCreate", wrapPrepareMonsterTokenCreation, 'WRAPPER')
     registerCombatHooks()
 })
 Hooks.on('getHeaderControlsApplicationV2', addActiveEffectEnhanceOption)
@@ -48,6 +52,9 @@ Hooks.on('getHeaderControlsApplicationV2', addItemButtonAppV2)
 Hooks.on('getHeaderControlsApplicationV2', addValuableUseManager)
 Hooks.on('renderApplicationV2', renderValuableUses)
 Hooks.on('getHeaderControlsApplicationV2', addSituationalBonusButton)
+Hooks.on('getHeaderControlsApplicationV2', addMonsterPresetManager)
+Hooks.on('renderTokenHUD', addMonsterPresetHudControl)
+Hooks.on('updateToken', refreshMonsterPresetSheet)
 Hooks.on('getChatMessageContextOptions', addEnhancedDamageContextOption)
 function registerCustomRollClasses() {
     if (!Array.isArray(CONFIG.Dice?.rolls)) return
@@ -70,6 +77,9 @@ async function preloadTemplates() {
         TEMPLATE_PATHS.SHEET_SITUATIONAL_BONUS_MANAGER,
         TEMPLATE_PATHS.SHEET_ITEM_SITUATIONAL_BONUS_MANAGER,
         TEMPLATE_PATHS.SHEET_VALUABLE_USE_MANAGER,
+        TEMPLATE_PATHS.SHEET_MONSTER_PRESETS,
+        TEMPLATE_PATHS.DIALOG_EDIT_MONSTER_PRESET,
+        TEMPLATE_PATHS.DIALOG_SWITCH_MONSTER_PRESET,
         TEMPLATE_PATHS.DIALOG_SITUATIONAL_BONUSES,
         TEMPLATE_PATHS.DIALOG_WEAPON_SKILL_ATTACH_MODE,
         TEMPLATE_PATHS.DIALOG_WEAPON_SKILL_ATTACK_CHOICE,
