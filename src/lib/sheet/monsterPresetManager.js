@@ -1,6 +1,6 @@
 import { MODULE, TEMPLATE_PATHS } from '../util/constants.js';
 import {
-    captureMonsterPreset, DEFAULT_MONSTER_PRESET_ID, getActiveMonsterPresetId, getMonsterPresets,
+    canEditMonsterPresets, captureMonsterPreset, DEFAULT_MONSTER_PRESET_ID, getActiveMonsterPresetId, getMonsterPresets,
     getWildcardImages, initializeMonsterPresets, PLACEMENT_FLAG, RANDOM_PRESET, saveMonsterPresets,
     switchActorMonsterPreset
 } from '../data/monsterPresets.js';
@@ -41,13 +41,13 @@ export default class MonsterPresetManager extends HandlebarsApplicationMixin(App
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
         const activeId = getActiveMonsterPresetId(this.baseActor);
-        context.worldActor = !this.actor.isToken;
+        context.isBaseActor = this.actor === this.baseActor;
         context.presets = getMonsterPresets(this.baseActor).map(({ id, name, images }) => ({
             id, name, images,
-            active: context.worldActor && id === activeId,
+            active: context.isBaseActor && id === activeId,
             canRemove: id !== DEFAULT_MONSTER_PRESET_ID && id !== activeId
         }));
-        if (context.worldActor) {
+        if (context.isBaseActor) {
             const choices = {
                 '': localize('PlacementCurrent'),
                 [RANDOM_PRESET]: localize('PlacementRandom'),
@@ -66,9 +66,12 @@ export default class MonsterPresetManager extends HandlebarsApplicationMixin(App
         const select = this.element.querySelector('[name="presetOnPlacement"]');
         if (!select) return;
         select.onchange = async () => {
-            if (!this.baseActor.isOwner) return this.render();
             select.disabled = true;
             try {
+                if (!canEditMonsterPresets(this.baseActor)) {
+                    ui.notifications.warn(localize('SaveFailed'));
+                    return;
+                }
                 const updated = await this.baseActor.update({
                     [`prototypeToken.flags.${MODULE.ID}.${PLACEMENT_FLAG}`]: select.value
                 });
@@ -84,7 +87,7 @@ export default class MonsterPresetManager extends HandlebarsApplicationMixin(App
     }
 
     async savePresets(change, activeId) {
-        if (!this.baseActor.isOwner || !this.actor.isOwner) return;
+        if (!this.actor.isOwner) return;
         const presets = change(getMonsterPresets(this.baseActor));
         const updated = await saveMonsterPresets(this.baseActor, presets, activeId);
         if (!updated) ui.notifications.warn(localize('SaveFailed'));
@@ -165,12 +168,14 @@ export function addMonsterPresetManager(sheet, buttons) {
     const actor = sheet.document;
     if (actor?.documentName !== 'Actor' || actor.type !== 'monster' || !actor.isOwner) return;
     const baseActor = actor.isToken ? actor.token?.baseActor : actor;
-    if (!baseActor?.isOwner || game.actors.get(baseActor.id) !== baseActor) return;
+    if (!canEditMonsterPresets(baseActor)) return;
+    if (!baseActor.pack && game.actors.get(baseActor.id) !== baseActor) return;
     buttons.push({
         class: 'monster-presets',
         icon: 'fa-solid fa-layer-group',
         label: `${prefix}.Title`,
         onClick: async () => {
+            if (!canEditMonsterPresets(baseActor)) return ui.notifications.warn(localize('SaveFailed'));
             let manager = managers.get(actor);
             if (manager) return manager.render(true);
             manager = new MonsterPresetManager(actor, baseActor);

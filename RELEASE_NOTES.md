@@ -1,5 +1,9 @@
 # WTTRPG Enhancements release notes
 
+## 0.0.30 - Compendium Monster Presets
+
+- Open **Monster Presets** from an owned Monster sheet in an unlocked compendium. Saved presets and the **Preset on placement** setting carry over when the Monster is imported into the world.
+
 ## 0.0.29 - Foundry Compatibility
 
 - Require Foundry VTT 14.369 or later. This build fixes the embedded collection replacement bug that could leave items from the previous Monster Preset in inventory.

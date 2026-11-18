@@ -38,6 +38,10 @@ export function getActiveMonsterPresetId(actor) {
     return actor.getFlag(MODULE.ID, ACTIVE_PRESET_FLAG) ?? DEFAULT_MONSTER_PRESET_ID;
 }
 
+export function canEditMonsterPresets(actor) {
+    return actor?.isOwner && (!actor.pack || game.packs.get(actor.pack)?.locked === false);
+}
+
 export async function initializeMonsterPresets(actor, defaultName) {
     const presets = getMonsterPresets(actor);
     if (presets.some(preset => preset.id === DEFAULT_MONSTER_PRESET_ID)) return true;
@@ -48,6 +52,7 @@ export async function initializeMonsterPresets(actor, defaultName) {
 }
 
 export async function saveMonsterPresets(actor, presets, activeId) {
+    if (!canEditMonsterPresets(actor)) return false;
     const update = { [presetPath]: presets };
     if (activeId) update[activePresetPath] = activeId;
     return Boolean(await actor.update(update));
@@ -68,6 +73,7 @@ export function hasSpentResources(actor) {
 function getPresetItems(preset, actorUuid, baseActor) {
     const items = foundry.utils.deepClone(preset.items);
     const sourceUuids = new Set([preset.actorUuid, baseActor.uuid]);
+    if (baseActor._stats?.compendiumSource) sourceUuids.add(baseActor._stats.compendiumSource);
     // Embedded item IDs stay stable. Owned weapon skills and bonuses store their parent as a UUID.
     for (const item of items) {
         for (const key of ['parentWeaponUuid', 'parentItemUuid']) {
@@ -102,7 +108,7 @@ async function protectTokenPresets(actor, incomingItems, incomingModifiers) {
 }
 
 export async function switchActorMonsterPreset(actor, presetId) {
-    if (actor.type !== 'monster' || actor.isToken || !actor.isOwner) return false;
+    if (actor.type !== 'monster' || actor.isToken || !canEditMonsterPresets(actor)) return false;
     const activeId = getActiveMonsterPresetId(actor);
     if (activeId === presetId) return true;
     const presets = getMonsterPresets(actor);
@@ -110,7 +116,7 @@ export async function switchActorMonsterPreset(actor, presetId) {
     if (!preset) return false;
 
     const items = getPresetItems(preset, actor.uuid, actor);
-    if (!await protectTokenPresets(actor, items, preset.system.skillGroupModifiers ?? {})) return false;
+    if (!actor.pack && !await protectTokenPresets(actor, items, preset.system.skillGroupModifiers ?? {})) return false;
     if (getActiveMonsterPresetId(actor) !== activeId || getMonsterPresets(actor) !== presets) return false;
 
     const current = captureMonsterPreset(actor);

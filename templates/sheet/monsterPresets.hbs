@@ -1,5 +1,5 @@
 <section class="monster-preset-manager">
-    {{#if worldActor}}
+    {{#if isBaseActor}}
     <p>{{localize "WTTRPGEnhancements.MonsterPresets.ActorManageHint"}}</p>
     <div class="form-group">
         <label for="{{placementId}}">{{localize "WTTRPGEnhancements.MonsterPresets.PlacementLabel"}}</label>
@@ -24,7 +24,7 @@
             <strong>{{name}}</strong>
             {{#if active}}
             <span>{{localize "WTTRPGEnhancements.MonsterPresets.Active"}}</span>
-            {{else if ../worldActor}}
+            {{else if ../isBaseActor}}
             <button type="button" data-action="switch" data-preset-id="{{id}}"
                 data-tooltip aria-label="{{localize 'WTTRPGEnhancements.MonsterPresets.LoadOnActor' name=name}}">
                 <i class="fa-solid fa-right-left" inert></i> {{localize "WTTRPGEnhancements.MonsterPresets.Load"}}
