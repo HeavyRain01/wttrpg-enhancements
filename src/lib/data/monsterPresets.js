@@ -19,6 +19,7 @@ const PRESET_SYSTEM_FIELDS = [
     'immunities', 'susceptibilities', 'senses'
 ];
 const DERIVED_RESOURCES = ['hp', 'sta', 'resolve', 'focus', 'shield'];
+const switchingActors = new WeakSet();
 
 export function getMonsterPresets(actor) {
     const presets = actor?.getFlag(MODULE.ID, PRESET_FLAG);
@@ -108,7 +109,16 @@ async function protectTokenPresets(actor, incomingItems, incomingModifiers) {
 }
 
 export async function switchActorMonsterPreset(actor, presetId) {
-    if (actor.type !== 'monster' || actor.isToken || !canEditMonsterPresets(actor)) return false;
+    if (actor.type !== 'monster' || actor.isToken || !canEditMonsterPresets(actor) || switchingActors.has(actor)) return false;
+    switchingActors.add(actor);
+    try {
+        return await switchActorPreset(actor, presetId);
+    } finally {
+        switchingActors.delete(actor);
+    }
+}
+
+async function switchActorPreset(actor, presetId) {
     const activeId = getActiveMonsterPresetId(actor);
     if (activeId === presetId) return true;
     const presets = getMonsterPresets(actor);
@@ -123,12 +133,29 @@ export async function switchActorMonsterPreset(actor, presetId) {
     const replacement = foundry.data.operators.ForcedReplacement;
     const system = Object.fromEntries(Object.entries(preset.system)
         .map(([key, value]) => [key, replacement.create(value)]));
-    return Boolean(await actor.update({
-        system,
-        items: replacement.create(items),
-        [presetPath]: presets.map(entry => entry.id === activeId ? { ...entry, ...current } : entry),
-        [activePresetPath]: preset.id
-    }));
+    const itemIds = new Set(items.map(item => item._id));
+    const removedIds = current.items.filter(item => !itemIds.has(item._id)).map(item => item._id);
+    let applied = false;
+    try {
+        // Delete obsolete embedded documents explicitly. A parent Actor update can retain them when replacing items.
+        if (removedIds.length) {
+            await actor.deleteEmbeddedDocuments('Item', removedIds);
+            if (actor.toObject().items.some(item => removedIds.includes(item._id))) return false;
+        }
+        applied = Boolean(await actor.update({
+            system,
+            items: replacement.create(items),
+            [presetPath]: presets.map(entry => entry.id === activeId ? { ...entry, ...current } : entry),
+            [activePresetPath]: preset.id
+        }));
+        return applied;
+    } finally {
+        if (!applied) {
+            const remainingIds = new Set(actor.toObject().items.map(item => item._id));
+            const missing = current.items.filter(item => !remainingIds.has(item._id));
+            if (missing.length) await actor.createEmbeddedDocuments('Item', missing, { keepId: true });
+        }
+    }
 }
 
 function fillResources(token, system, items) {

@@ -1,5 +1,11 @@
 # WTTRPG Enhancements release notes
 
+## 0.0.31 - World Actor Preset Inventory
+
+- Switching Monster Presets on a world actor explicitly removes equipment absent from the destination preset, preventing items from accumulating across switches.
+- Restore removed items if the switch fails, and prevent overlapping switches on the same actor.
+- Presets already saved with accumulated equipment need to be restored from a clean source.
+
 ## 0.0.30 - Compendium Monster Presets
 
 - Open **Monster Presets** from an owned Monster sheet in an unlocked compendium. Saved presets and the **Preset on placement** setting carry over when the Monster is imported into the world.
