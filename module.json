@@ -9,7 +9,7 @@
   "library": "false",
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
-    "minimum": 13,
+    "minimum": "14.369",
     "verified": 14,
     "maximum": 14
   },

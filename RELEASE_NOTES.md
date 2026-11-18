@@ -1,5 +1,9 @@
 # WTTRPG Enhancements release notes
 
+## 0.0.29 - Foundry Compatibility
+
+- Require Foundry VTT 14.369 or later. This build fixes the embedded collection replacement bug that could leave items from the previous Monster Preset in inventory.
+
 ## 0.0.28 - Monster Presets
 
 - Save named variations of a Monster’s stats, skills, and inventory. The **Monster Presets** window starts with an editable Default preset and saves the active preset’s edits when you switch the actor to another variant.
